@@ -45,14 +45,18 @@ class TwitterCrawler():
     #     return headers
 
     def __connect_to_endpoint(self, url: str, params: dict, next_token: str  = None,
-     sleep_time:int = 3, verbose:bool = False, is_retweet = False):
+     sleep_time:int = 3, num_of_trails = 10, verbose:bool = False, is_retweet = False):
 
             if is_retweet:
                 params['pagination_token'] = next_token 
             else:
                 params['next_token'] = next_token   #params object received from create_url function
 
-            for i in range(10):
+            for i in range(num_of_trails):
+
+                if i > num_of_trails//2: 
+                    print(f"Failed to connect {i} times, going to sleep for 15 minutes..")
+                    time.sleep(15*60) # sleep for 15 minutes
 
                 response = requests.request("GET", url, headers = self.headers, params = params)
                 if verbose: print(f"Trail #{i} Response Code: " + str(response.status_code))
@@ -688,7 +692,10 @@ class TwitterCrawler():
     def return_retweets_by_tweet_ids(self, tweet_ids,max_results = 10, evaluate_last_token = False,
                                         limit_amount_of_returned_retweets = 10000000,
                                     verbose = False, dir_tree_name = "conversation_trees"):
-
+                if max_results > 100:
+                    max_results = 100
+                    print('max_results can not be greater than 100, changed to 100')
+                    
                 if type(tweet_ids) != list:
                     tweet_ids = [tweet_ids]
                 
