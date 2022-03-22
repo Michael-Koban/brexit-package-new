@@ -3,7 +3,7 @@ import os
 import json
 import pandas as pd
 import csv , datetime, unicodedata, time, datetime, tweeterid #dateutil.parserm, 
-
+from datetime import datetime
 
 class TwitterCrawler():
     """Summary of class here.
@@ -44,8 +44,13 @@ class TwitterCrawler():
     #     headers = {"Authorization": "Bearer {}".format(self.bearer_token)}
     #     return headers
 
-    def __connect_to_endpoint(self, url: str, params: dict, next_token: str  = None, sleep_time:int = 3, verbose:bool = False):
-            params['next_token'] = next_token   #params object received from create_url function
+    def __connect_to_endpoint(self, url: str, params: dict, next_token: str  = None,
+     sleep_time:int = 3, verbose:bool = False, is_retweet = False):
+
+            if is_retweet:
+                params['pagination_token'] = next_token 
+            else:
+                params['next_token'] = next_token   #params object received from create_url function
 
             for i in range(10):
 
@@ -500,4 +505,220 @@ class TwitterCrawler():
             
             # if verbose: print(f'~~~~~ Batch done, moving forward (sleep 2 min for debug)')
             # time.sleep(5)  
+
+
+
+    def return_retweets_of_tweet_id_SMALL(self, tweet_id=None,
+                                        max_results = 10, evaluate_last_token = False,
+                                        limit_amount_of_returned_retweets = 10000000,
+                                    verbose = False, dir_tree_name = "conversation_trees"):
+
+        search_url = "https://api.twitter.com/2/tweets/:id/retweeted_by" #endpoint use to collect data from
+        search_url = search_url.replace(":id", tweet_id)
+
+        import os.path
+        #making a dir for the tree - this file will cintain a unique file for each conversation id
+        #dir_tree_name = "conversation_trees"
+        try:
+            os.mkdir(dir_tree_name)
+            print("creating tree directory", dir_tree_name, "to store all the trees")
+        except:
+            print("The dir", dir_tree_name ,"already exist")
+        
+        
+        #making dir (inside the tree dir) to store, for each tweet-id all its retweets
+        name_for_tweet_id = "conv_tree_for_" + str(tweet_id)
+        dir_name_for_tweet_id = os.path.join(dir_tree_name, name_for_tweet_id) 
+        try:
+            os.mkdir(dir_name_for_tweet_id)
+            print("creating directory", dir_name_for_tweet_id, "to insert all the retweets of the given tweet-id")
+        except:
+            print("The dir", dir_name_for_tweet_id ,"already exist")
+
+        ##### the log dir
+        dir_log_name = os.path.join(dir_name_for_tweet_id, "log_retweets_for_tweet_id_" + tweet_id) 
+        try:
+            os.mkdir(dir_log_name)
+            print("creating directory", dir_log_name, "to insert all the logs of the retweets for the tweet id - ", str(tweet_id))
+        except:
+            print("The dir", dir_log_name ,"already exist")
+            
+        ########################
+    #     path_for_log_dir_of_certain_user = os.path.join(dir_log_name, user_name)
+    #     try:
+    #         os.mkdir(path_for_log_dir_of_certain_user)
+    #         print("creating directory", path_for_log_dir_of_certain_user,"in the dir",dir_log_name, "to insert all the logs of the key opinion leader", user_name)
+    #     except:
+    #         print("The dir", path_for_log_dir_of_certain_user ,"already exist")
+
+        path_for_dir_retriving_retweets_stream = os.path.join(dir_log_name, 'retriving_retweets_streem.txt')
+
+        with open(path_for_dir_retriving_retweets_stream, 'a') as f:
+            from datetime import datetime
+            time_now = datetime.now()
+            current_time = time_now.strftime("%H:%M:%S (Date: %d.%m.%y)")
+            current_time = "Current Time: " + current_time + "   *****************************************   "
+            f.write(current_time + '\n\n')
+
+        ########### If the token file exist already, then take the last token available, else start from token 1  ############ 
+        tokens_location = os.path.join(dir_log_name, "tokens.txt") 
+
+        if (evaluate_last_token == True and os.path.isfile(tokens_location) == True):
+            a_file = open(tokens_location, "r")
+            lines = a_file.readlines()
+            last_lines = lines[-2]
+            next_token = last_lines[0:-1]
+            a_file.close()    
+        else:
+            next_token = None
+
+        ################ Add a time stamp ########################################
+        with open(tokens_location, 'a') as f:
+            from datetime import datetime
+            now = datetime.now()
+            current_time = now.strftime("%H:%M:%S (Date: %d.%m.%y)")
+            current_time = "Current Time: " + current_time + "   *****************************************   "
+            f.write(current_time+ '\n\n')
+
+        ##########################################################################################
+
+        continue_searching = True
+        json_response_list = []
+        next_tokens = []
+        num_of_returned_retweets = 0
+        counter_loops = 0
+
+        while continue_searching == True and num_of_returned_retweets < limit_amount_of_returned_retweets:
+            counter_loops +=1
+            if counter_loops > 1:
+                next_token = json_response["meta"]["next_token"]
+                query_params["pagination_token"] = next_token
+                print("token to insert:",next_token)
+            #if the returned amount of retweets is getting close to the limit number, we need to alter the max_result,
+            #so we won't get retweets beyond what we asked
+            #if (limit_amount_of_returned_retweets - num_of_returned_retweets) < max_results:
+            max_results = min(limit_amount_of_returned_retweets - num_of_returned_retweets,max_results)
+            #else :
+            #    max_results = max_results
+
+        #change params based on the endpoint you are using
+            query_params = {
+                            'expansions': 'pinned_tweet_id',
+                            'tweet.fields': 'id,text,author_id,in_reply_to_user_id,geo,conversation_id,created_at,lang,public_metrics,referenced_tweets,reply_settings,source',
+                            'user.fields': 'id,name,username,created_at,description,public_metrics,verified',
+                            #'place.fields': 'contained_within, country, country_code, full_name, geo, id, name, place_type',
+                            'max_results': max_results,
+                            'pagination_token': next_token}
+
+            
+            json_response = self.__connect_to_endpoint(url = search_url, params= query_params, next_token = next_token, is_retweet = True)
+
+            json_response_list.append(json_response) #the first json_response itme
+            num_of_returned_retweets += json_response["meta"]["result_count"]
+
+            ##### making a dataframe out of the json response:
+            try:
+                a = pd.json_normalize(json_response["data"])
+                a["id_new"] = "id: " + a["id"].astype("string")
+                list_of_cols_to_add = ["id","id_new", "verified", "username", "name", "created_at", "public_metrics.followers_count",
+                                    "public_metrics.following_count", "public_metrics.tweet_count",
+                                    "public_metrics.listed_count", "pinned_tweet_id"]
+                list_cols_to_drop = [x for x in a.columns if x not in list_of_cols_to_add]
+
+                ##droping labels we don't need
+                df_tweets_i = a.drop(labels=list_cols_to_drop, axis = 1, errors = "ignore")
+
+                for col in list_of_cols_to_add:
+                    if col not in df_tweets_i.columns:
+                        df_tweets_i[col] = "NA"
+
+                #sort columns by alphabetic order
+                col_list_df_tweets_i = df_tweets_i.columns.tolist()
+                col_list_df_tweets_i.sort()
+                df_tweets_i = df_tweets_i.reindex(columns=col_list_df_tweets_i)
+
+                name = tweet_id + ".csv"
+                path_for_table = os.path.join(dir_name_for_tweet_id, name)
+                if os.path.isfile(path_for_table) == False: #if this is the first table of tweets
+                    df_tweets_i.to_csv(path_for_table, index=True)
+                else:
+                    df_tweets_i.to_csv(path_for_table, mode='a', index=True, header=False)
+            except:
+                print("no data / include in the json")
+
+            path_for_dir_all_json_responses = os.path.join(dir_log_name, 'all_json_responses.json')
+            with open(path_for_dir_all_json_responses, 'w') as outfile:
+                json.dump(json_response_list, outfile)
+
+            with open(path_for_dir_retriving_retweets_stream, 'a') as f:
+                print_stat = str(counter_loops) + " -> Got from twitter " + str(json_response["meta"]["result_count"]) + " tweets, and there are more tweets of that user to get, I am bringing more tweets!"
+                f.write(print_stat+'\n')
+                print_total = "Total amount of tweets: " + str(num_of_returned_retweets)
+                f.write(print_total+ '\n\n')
+
+            if "next_token" in json_response["meta"]:
+                if (verbose == True and counter_loops % 20 == 1):
+                    print(counter_loops, "Got from twitter", json_response["meta"]["result_count"], "tweets, and there are more tweets of that user to get, I am bringing more tweets!\n")
+                elif verbose == False:
+                    print(counter_loops, "Got from twitter", json_response["meta"]["result_count"], "tweets, and there are more tweets of that user to get, I am bringing more tweets!\n")
+                next_token = json_response["meta"]["next_token"]
+                query_params["pagination_token"] = next_token
+                next_tokens.append(next_token)
+                #ids_token_print = "next token = " + next_token + "newest id: " + json_response["meta"]["newest_id"] + " | oldest id: " + json_response["meta"]["oldest_id"]
+                ids_token_print = next_token
+                with open(tokens_location, 'a') as f:
+                    f.write(ids_token_print + '\n\n')
+            else:
+                print("no more tweets from this user")
+                continue_searching = False
+                print("Total amount of collected tweets = ", num_of_returned_retweets)
+
+            if num_of_returned_retweets >=limit_amount_of_returned_retweets:
+                print("oooops, There may be more tweets to return, but you asked to limit the amount of returned tweets")
+                print("infact you got", num_of_returned_retweets, "returned tweets and limited the function to get", limit_amount_of_returned_retweets, "tweets")
+
+        #In what case we suspect that there may be more tweets that we didn't get? -->
+        #When the number of tweets we asked to get is equal to the number of tweets we got back
+
+        ### save all thr json responses in json file:
+
+        return json_response_list, num_of_returned_retweets, next_tokens
+
+
+    def return_retweets_by_tweet_ids(self, tweet_ids,max_results = 10, evaluate_last_token = False,
+                                        limit_amount_of_returned_retweets = 10000000,
+                                    verbose = False, dir_tree_name = "conversation_trees"):
+
+                if type(tweet_ids) != list:
+                    tweet_ids = [tweet_ids]
+                
+                #users_json_response_lists = []
+                tweet_ids_evaluated = []
+                tweet_ids_didnt_evaluated = []
+                next_tokens_users= [] #this will include a list where eachelement is a list containing all the tokens off the specific user
+                for tweet_id in tweet_ids:
+                    print("Bringing retweets of", tweet_id)
+                    try:
+                        json_response_list, num_of_returned_retweets,next_tokens =\
+                             self.return_retweets_of_tweet_id_SMALL(tweet_id=tweet_id,
+                                    max_results = max_results, evaluate_last_token = evaluate_last_token,
+                                    limit_amount_of_returned_retweets = limit_amount_of_returned_retweets,
+                                   verbose = verbose, dir_tree_name = dir_tree_name)
+                        
+                        
+                        print(num_of_returned_retweets)
+                        if num_of_returned_retweets > 0:
+                            tweet_ids_evaluated.append(tweet_id)
+                            next_tokens_users.append(next_tokens)
+                    
+
+                        else:
+                            tweet_ids_didnt_evaluated.append(tweet_id)
+                            print("The tweet_id:", tweet_id, "had", num_of_returned_retweets, "tweets!!")
+
+                        print("---------------------------------------------------------------")
+                    except:
+                        print("There was a problem with the tweet id:", tweet_id)
+                        tweet_ids_didnt_evaluated.append(tweet_id)
+                        print("*************************************************************************************")
 

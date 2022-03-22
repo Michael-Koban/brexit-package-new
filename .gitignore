@@ -1,5 +1,7 @@
 json_tweets_output/
 brexit-env/
+key_opinion_leaders_tweets_tables_beta/
+conversation_trees/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
