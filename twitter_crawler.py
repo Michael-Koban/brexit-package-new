@@ -508,7 +508,7 @@ class TwitterCrawler():
 
 
 
-    def return_retweets_of_tweet_id_SMALL(self, tweet_id=None,
+    def __return_retweets_of_tweet_id_SMALL(self, tweet_id=None,
                                         max_results = 10, evaluate_last_token = False,
                                         limit_amount_of_returned_retweets = 10000000,
                                     verbose = False, dir_tree_name = "conversation_trees"):
@@ -700,7 +700,7 @@ class TwitterCrawler():
                     print("Bringing retweets of", tweet_id)
                     try:
                         json_response_list, num_of_returned_retweets,next_tokens =\
-                             self.return_retweets_of_tweet_id_SMALL(tweet_id=tweet_id,
+                             self.__return_retweets_of_tweet_id_SMALL(tweet_id=tweet_id,
                                     max_results = max_results, evaluate_last_token = evaluate_last_token,
                                     limit_amount_of_returned_retweets = limit_amount_of_returned_retweets,
                                    verbose = verbose, dir_tree_name = dir_tree_name)
