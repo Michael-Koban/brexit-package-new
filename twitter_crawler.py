@@ -617,6 +617,11 @@ class TwitterCrawler():
             
             json_response = self.__connect_to_endpoint(url = search_url, params= query_params, next_token = next_token, is_retweet = True)
 
+            # #check if the tweeet_id is valid = if we can find its retweets:
+            # if "data" not in json_response:
+            #     tweet_ids_not_found.append(json_response["errors"][0]["resource_id"])
+            #     print("prob")
+
             json_response_list.append(json_response) #the first json_response itme
             num_of_returned_retweets += json_response["meta"]["result_count"]
 
