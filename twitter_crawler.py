@@ -868,29 +868,18 @@ class TwitterCrawler():
                 a["id_new"] = "id: " + a["id"].astype("string")
                 b = pd.json_normalize(json_response["includes"], ["users"]).add_prefix("users.")
 
-                #add 2 new columns for referenced tweets
-                referenced_tweet_type = []
-                referenced_tweet_id = []
-                for row in range(a.shape[0]):
-                    referenced_tweet_type.append(a.referenced_tweets[0][0]["type"])
-                    referenced_tweet_id.append(a.referenced_tweets[0][0]["id"])
-
-                a["referenced_tweets_type"] = np.asarray(referenced_tweet_type)
-                a["referenced_tweets_id"] = np.asarray(referenced_tweet_id)
-
-                
                 df_tweets_i = pd.merge(a, b, left_on="author_id", right_on="users.id")
 
                 list_of_cols_to_add = ['id', "id_new", 'conversation_id', 'lang', 'author_id', 'referenced_tweets',
                                     'text', 'created_at', 'source', 'reply_settings',
                                     'public_metrics.retweet_count', 'public_metrics.reply_count',
                                     'public_metrics.like_count', 'public_metrics.quote_count',
-                                    'in_reply_to_user_id', 'geo.place_id', 'referenced_tweet_type', 'referenced_tweet_id',
+                                    'in_reply_to_user_id', 'geo.place_id',
                                     'users.username', 'users.name', 'users.verified',
                                     'users.created_at', 'users.id', 'users.public_metrics.followers_count',
                                     'users.public_metrics.following_count',
                                     'users.public_metrics.tweet_count',
-                                    'users.public_metrics.listed_count']
+                                    'users.public_metrics.listed_count'] #'referenced_tweet_type', 'referenced_tweet_id'
                 
                 list_cols_to_drop = [x for x in a.columns if x not in list_of_cols_to_add]
 
@@ -901,6 +890,17 @@ class TwitterCrawler():
                     if col not in df_tweets_i.columns:
                         df_tweets_i[col] = "NA"
 
+
+                
+                # #add 2 new columns for referenced tweets
+                # referenced_tweet_type = []
+                # referenced_tweet_id = []
+                # for row in range(df_tweets_i.shape[0]):
+                #     referenced_tweet_type.append(df_tweets_i.referenced_tweets[0][0]["type"])
+                #     referenced_tweet_id.append(df_tweets_i.referenced_tweets[0][0]["id"])
+                            
+                # df_tweets_i["referenced_tweets_type"] = np.asarray(referenced_tweet_type)
+                # df_tweets_i["referenced_tweets_id"] = np.asarray(referenced_tweet_id)
                 #sort columns by alphabetic order
                 col_list_df_tweets_i = df_tweets_i.columns.tolist()
                 col_list_df_tweets_i.sort()
@@ -953,7 +953,7 @@ class TwitterCrawler():
         #When the number of tweets we asked to get is equal to the number of tweets we got back
 
 
-        return json_response_list, num_of_returned_quotes, next_tokens
+        return json_response_list, num_of_returned_quotes, next_tokens,path_for_table
 
 
     def return_quotes_by_tweet_ids(self, tweet_ids,max_results = 10, evaluate_last_token = False,
@@ -972,15 +972,18 @@ class TwitterCrawler():
                     tweet_ids_evaluated = []
                     tweet_ids_didnt_evaluated = []
                     next_tokens_users= [] #this will include a list where eachelement is a list containing all the tokens off the specific user
+                    path_for_table_dict = {}
                     for tweet_id in tweet_ids:
                         print("Bringing quotes of", tweet_id)
                         try:
-                            json_response_list, num_of_returned_quotes,next_tokens =\
+                            json_response_list, num_of_returned_quotes,next_tokens, path_for_table =\
                                 self.__return_quotes_of_tweet_id_SMALL(tweet_id=tweet_id,
                                         max_results = max_results, evaluate_last_token = evaluate_last_token,
                                         limit_amount_of_returned_quotes = limit_amount_of_returned_quotes,
                                     verbose = verbose, dir_tree_name = dir_tree_name)
                             
+                            path_for_table_dict[tweet_id] = path_for_table
+
                             
                             print(num_of_returned_quotes)
                             if num_of_returned_quotes > 0:
@@ -997,5 +1000,36 @@ class TwitterCrawler():
                             print("There was a problem with the tweet id:", tweet_id)
                             tweet_ids_didnt_evaluated.append(tweet_id)
                             print("*************************************************************************************")
+
+                    return path_for_table_dict
+
+    def get_conversation_tree(self, tweet_id : str ,max_results = 10,\
+        tree_height = 1, evaluate_last_token = False,\
+        limit_amount_of_returned_quotes = 10000000, verbose = False, dir_tree_name = "conversation_trees"):
+        
+        print(f'tree_height: {tree_height}\n tweet_id: {tweet_id}')
+
+        if(tree_height < 1):
+            return "Tree depth reached maximum"
+
+        path_for_table_dict = self.return_quotes_by_tweet_ids(tweet_ids=tweet_id, max_results=max_results,\
+            limit_amount_of_returned_quotes = limit_amount_of_returned_quotes, verbose = verbose, dir_tree_name =dir_tree_name)
+        
+        if not path_for_table_dict: return f"No retweets/quotes for tweet {tweet_id}"
+
+        retweets_df = pd.read_csv( path_for_table_dict[tweet_id])
+
+        retweets_ids = list(retweets_df.id_new)
+
+        retweets_ids = [x.split(' ')[1] for x in retweets_ids]
+
+        for retweet_id in retweets_ids:
+            #os.make_dir('')
+            self.get_conversation_tree(tweet_id=retweet_id, max_results=max_results, tree_height = tree_height - 1,\
+            limit_amount_of_returned_quotes = limit_amount_of_returned_quotes, verbose = verbose, dir_tree_name = dir_tree_name + '/conv_tree_for_' + tweet_id)
+
+            
+            
+
 
 
