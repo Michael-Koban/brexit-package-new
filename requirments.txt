@@ -37,3 +37,4 @@ traitlets==5.1.1
 tweeterid==1.0.0
 urllib3==1.26.8
 wcwidth==0.2.5
+file_read_backwards==2.0.0
