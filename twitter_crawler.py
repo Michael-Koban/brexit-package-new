@@ -1441,6 +1441,8 @@ class TwitterCrawler():
         
         return json_response_list, num_of_returned_comments, next_tokens, path_for_table
 
+#max result in comment function: 10 - 500
+
     def return_comments_by_tweet_ids(self, conversation_ids = None, query = "",
                                 start_time = "2015-12-7T00:00:00Z",
                                 end_time = "today",
@@ -1450,11 +1452,11 @@ class TwitterCrawler():
                                 
         
         tweet_ids = conversation_ids
-        if max_results > 100:
-            max_results = 100
+        if max_results > 500:
+            max_results = 500
             print('max_results can not be greater than 100, changed to 100')
-        if max_results < 1:
-            max_results = 1
+        if max_results < 10:
+            max_results = 10
             print('max_results can not be smaller than 10, changed to 10')
         if type(tweet_ids) != list:
             tweet_ids = [tweet_ids]
