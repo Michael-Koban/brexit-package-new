@@ -1158,7 +1158,6 @@ class TwitterCrawler():
                     json.dump(json_response_list, outfile)
 
 
-
             with open(path_for_dir_retriving_likes_stream, 'a') as f:
                 print_stat = str(counter_loops) + " -> Got from twitter " + str(json_response["meta"]["result_count"]) + " tweets, and there are more tweets of that user to get, I am bringing more tweets!"
                 f.write(print_stat+'\n')
@@ -1185,6 +1184,9 @@ class TwitterCrawler():
             if num_of_returned_likes >=limit_amount_of_returned_likes:
                 print("oooops, There may be more likes to return, but you asked to limit the amount of returned likes")
                 print("infact you got", num_of_returned_likes, "returned likes and limited the function to get", limit_amount_of_returned_likes, "tweets")
+
+        return json_response_list, num_of_returned_likes, next_tokens, path_for_table
+
 
     def return_likes_by_tweet_ids(self, tweet_ids,max_results = 10, evaluate_last_token = False,
                                             limit_amount_of_returned_likes = 10000000,
@@ -1232,6 +1234,270 @@ class TwitterCrawler():
                             print("*************************************************************************************")
 
                     return path_for_table_dict
+
+
+###### replies:
+# Twitter's API doesn't allow you to get replies to a particular tweet. Strange
+# but true. But you can use Twitter's Search API to search for tweets that are
+# directed at a particular user, and then search through the results to see if 
+# any are replies to a given tweet. You probably are also interested in the
+# replies to any replies as well, so the process is recursive. The big caveat 
+# here is that the search API only returns results for the last 7 days. So 
+# you'll want to run this sooner rather than later.
+#### link: https://gist.github.com/edsu/54e6f7d63df3866a87a15aed17b51eaf
+
+## To get the commetnts f a certain tweet you need to provide the conversation id
+    def __return_replies_of_conv_id_SMALL(self, conversation_id="", query = "",
+                                        start_time = "2015-12-7T00:00:00Z",
+                                        end_time = "today",
+                                        max_results = 10, evaluate_last_token = False,
+                                        limit_amount_of_returned_comments = 10000000,
+                                        verbose = False, dir_tree_name = "conversation_trees"):
+        
+        from datetime import date
+        if end_time == "today":
+            #if you wish to get all the comments that were written till this day:
+            end_time = date.today().strftime("%Y-%m-%d")+"T00:00:00Z"
+
+        tweet_id = conversation_id
+        search_url = "https://api.twitter.com/2/tweets/search/all" #endpoint use to collect data from
+        query = query + "conversation_id:"+ str(conversation_id)
+
+        import os.path
+        #making a dir for the tree - this file will cintain a unique file for each conversation id
+        #dir_tree_name = "conversation_trees"
+        try:
+            os.mkdir(dir_tree_name)
+            print("creating tree directory", dir_tree_name, "to store all the trees")
+        except:
+            print("The dir", dir_tree_name ,"already exist")
+
+
+        #making dir (inside the tree dir) to store, for each tweet-id all its quotes
+        name_for_tweet_id = "conv_tree_for_" + str(tweet_id)
+        dir_name_for_tweet_id = os.path.join(dir_tree_name, name_for_tweet_id) 
+        try:
+            os.mkdir(dir_name_for_tweet_id)
+            print("creating directory", dir_name_for_tweet_id, "to insert all the comments of the given conversation-id")
+        except:
+            print("The dir", dir_name_for_tweet_id ,"already exist")
+
+        ##### the log dir
+        dir_log_name = os.path.join(dir_name_for_tweet_id, "log_comments_for_conversation_id_" + tweet_id) 
+        try:
+            os.mkdir(dir_log_name)
+            print("creating directory", dir_log_name, "to insert all the logs of the comments for the tweet id - ", str(tweet_id))
+        except:
+            print("The dir", dir_log_name ,"already exist")
+
+        ########################
+
+        path_for_dir_retriving_comments_stream = os.path.join(dir_log_name, 'retriving_comments_streem.txt')
+        with open(path_for_dir_retriving_comments_stream, 'a') as f:
+            from datetime import datetime
+            now = datetime.now()
+            current_time = now.strftime("%H:%M:%S (Date: %d.%m.%y)")
+            current_time = "Current Time: " + current_time + "   *****************************************   "
+            f.write(current_time + '\n\n')
+
+        ########### If the token file exist already, then take the last token available, else start from token 1  ############ 
+        tokens_location = os.path.join(dir_log_name, "tokens.txt") 
+
+        if (evaluate_last_token == True and os.path.isfile(tokens_location) == True):
+            a_file = open(tokens_location, "r")
+            lines = a_file.readlines()
+            last_lines = lines[-2]
+            #next_token = last_lines[0:-1]
+            #a_file.close()
+            if "Current" in last_lines:
+                from file_read_backwards import FileReadBackwards
+
+                with FileReadBackwards(tokens_location, encoding="utf-8") as frb:
+                    for l in frb:
+                        if "Current" in l:
+                            continue
+                        elif any(c.isalpha() for c in l):
+                            next_token = l
+                            break
+        else:
+            next_token = None
+
+        ################ Add a time stamp ########################################
+        with open(tokens_location, 'a') as f:
+            from datetime import datetime
+            now = datetime.now()
+            current_time = now.strftime("%H:%M:%S (Date: %d.%m.%y)")
+            current_time = "Current Time: " + current_time + "   *****************************************   "
+            f.write(current_time+ '\n\n')
+
+        ##########################################################################################
+
+        continue_searching = True
+        json_response_list = []
+        next_tokens = []
+        num_of_returned_comments = 0
+        counter_loops = 0
+
+        while continue_searching == True and num_of_returned_comments < limit_amount_of_returned_comments:
+            counter_loops +=1
+            if counter_loops > 1:
+                next_token = json_response["meta"]["next_token"]
+                query_params["next_token"] = next_token
+                print("token to insert:",next_token)
+            #if the returned amount of quotes is getting close to the limit number, we need to alter the max_result,
+            #so we won't get quotes beyond what we asked
+            if (limit_amount_of_returned_comments - num_of_returned_comments) < max_results:
+                max_results = limit_amount_of_returned_comments - num_of_returned_comments
+            else :
+                max_results = max_results
+        #change params based on the endpoint you are using
+            query_params = {'query': query,
+                                    'start_time': start_time,
+                                    'end_time': end_time,
+                                    'max_results': max_results,
+                                    'expansions': 'author_id,in_reply_to_user_id,geo.place_id,entities.mentions.username,referenced_tweets.id',
+                                    'user.fields': 'id,name,username,created_at,description,public_metrics,verified',
+                                    'tweet.fields': 'id,text,author_id,in_reply_to_user_id,geo,conversation_id,created_at,lang,public_metrics,referenced_tweets,reply_settings,source',
+                                    'place.fields': 'full_name,id,country,country_code,geo,name,place_type',
+                                    'next_token': {next_token}}
+
+            json_response = self.__connect_to_endpoint(url = search_url, params= query_params, next_token = next_token, is_retweet = False)
+
+            json_response_list.append(json_response) #the first json_response itme
+            num_of_returned_comments += json_response["meta"]["result_count"]
+
+
+            ##### making a dataframe out of the json response:
+            try:
+                a = pd.json_normalize(json_response["data"])
+                a["id_new"] = "id: " + a["id"].astype("string")
+
+                b = pd.json_normalize(json_response["includes"], ["users"]).add_prefix("users.")
+
+                df_tweets_i = pd.merge(a, b, left_on="author_id", right_on="users.id")
+
+                list_of_cols_to_add = ['id', "id_new",'text', 'conversation_id', 'in_reply_to_user_id','reply_settings', 'referenced_tweets', 'lang', 'created_at',
+        'author_id', 'source', 'entities.mentions', 'public_metrics.retweet_count', 'public_metrics.reply_count',
+        'public_metrics.like_count', 'public_metrics.quote_count', 'users.username', 'users.created_at', 'users.id', 'users.description',
+            'users.verified', 'users.name', 'users.public_metrics.followers_count','users.public_metrics.following_count',
+            'users.public_metrics.tweet_count','users.public_metrics.listed_count'] #'referenced_tweet_type', 'referenced_tweet_id'
+
+                list_cols_to_drop = [x for x in a.columns if x not in list_of_cols_to_add]
+
+                ##droping labels we don't need
+                df_tweets_i = df_tweets_i.drop(labels=list_cols_to_drop, axis = 1, errors = "ignore")
+
+                for col in list_of_cols_to_add:
+                    if col not in df_tweets_i.columns:
+                        df_tweets_i[col] = "NA"
+
+                col_list_df_tweets_i = df_tweets_i.columns.tolist()
+                col_list_df_tweets_i.sort()
+                df_tweets_i = df_tweets_i.reindex(columns=col_list_df_tweets_i)
+
+                name = tweet_id + "_comments" + ".csv"
+                path_for_table = os.path.join(dir_name_for_tweet_id, name)
+                if os.path.isfile(path_for_table) == False: #if this is the first table of tweets
+                    df_tweets_i.to_csv(path_for_table, index=True)
+                else:
+                    df_tweets_i.to_csv(path_for_table, mode='a', index=True, header=False)
+
+            except:
+                print("no data / include in the json")
+
+                ### save all thr json responses in json file:
+                path_for_dir_all_json_responses = os.path.join(dir_log_name, 'all_json_responses.json')
+                with open(path_for_dir_all_json_responses, 'w') as outfile:
+                    json.dump(json_response_list, outfile)
+
+
+
+            with open(path_for_dir_retriving_comments_stream, 'a') as f:
+                print_stat = str(counter_loops) + " -> Got from twitter " + str(json_response["meta"]["result_count"]) + " comments, and there are more comments of that conversation-id to get, I am bringing more comments!"
+                f.write(print_stat+'\n')
+                print_total = "Total amount of tweets: " + str(num_of_returned_comments)
+                f.write(print_total+ '\n\n')
+
+            if "next_token" in json_response["meta"]:
+                if (verbose == True and counter_loops % 20 == 1):
+                    print(counter_loops, "Got from twitter", json_response["meta"]["result_count"], "comments, and there are more comments of that conversation-id to get, I am bringing more comments!\n")
+                elif verbose == False:
+                    print(counter_loops, "Got from twitter", json_response["meta"]["result_count"], "comments, and there are more comments of that conversation-id to get, I am bringing more comments!\n")
+                next_token = json_response["meta"]["next_token"]
+                query_params["next_token"] = next_token
+                next_tokens.append(next_token)
+                #ids_token_print = "next token = " + next_token + "newest id: " + json_response["meta"]["newest_id"] + " | oldest id: " + json_response["meta"]["oldest_id"]
+                ids_token_print = next_token
+                with open(tokens_location, 'a') as f:
+                    f.write(ids_token_print + '\n\n')
+            else:
+                print("no more comments from this conversation id")
+                continue_searching = False
+                print("Total amount of collected comments = ", num_of_returned_comments)
+
+            if num_of_returned_comments >=limit_amount_of_returned_comments:
+                print("oooops, There may be more comments to return, but you asked to limit the amount of returned comments")
+                print("infact you got", num_of_returned_comments, "returned comments and limited the function to get", limit_amount_of_returned_comments, "comments")
+        
+        return json_response_list, num_of_returned_comments, next_tokens, path_for_table
+
+    def return_comments_by_tweet_ids(self, conversation_ids = None, query = "",
+                                start_time = "2015-12-7T00:00:00Z",
+                                end_time = "today",
+                                max_results = 10, evaluate_last_token = False,
+                                limit_amount_of_returned_comments = 10000000,
+                                verbose = False, dir_tree_name = "conversation_trees"):
+                                
+        
+        tweet_ids = conversation_ids
+        if max_results > 100:
+            max_results = 100
+            print('max_results can not be greater than 100, changed to 100')
+        if max_results < 1:
+            max_results = 1
+            print('max_results can not be smaller than 10, changed to 10')
+        if type(tweet_ids) != list:
+            tweet_ids = [tweet_ids]
+
+        #users_json_response_lists = []
+        tweet_ids_evaluated = []
+        tweet_ids_didnt_evaluated = []
+        next_tokens_users= [] #this will include a list where eachelement is a list containing all the tokens off the specific user
+        path_for_table_dict = {}
+        for tweet_id in tweet_ids:
+            print("Bringing comments of", tweet_id)
+            try:
+                json_response_list, num_of_returned_comments,next_tokens, path_for_table =\
+                    self.__return_replies_of_conv_id_SMALL(conversation_id=tweet_id,
+                                                        query = query,
+                                                        start_time = start_time, end_time = end_time,
+                                                        max_results = max_results, evaluate_last_token = evaluate_last_token,
+                                                        limit_amount_of_returned_comments = limit_amount_of_returned_comments,
+                                                        verbose = verbose, dir_tree_name = dir_tree_name)
+
+                path_for_table_dict[tweet_id] = path_for_table
+
+                print(num_of_returned_comments)
+                if num_of_returned_comments > 0:
+                    tweet_ids_evaluated.append(tweet_id)
+                    next_tokens_users.append(next_tokens)
+
+
+                else:
+                    tweet_ids_didnt_evaluated.append(tweet_id)
+                    print("The conversation id:", tweet_id, "had", num_of_returned_comments, "comments!!")
+
+                print("---------------------------------------------------------------")
+            except:
+                print("There was a problem with the conversation id:", tweet_id)
+                tweet_ids_didnt_evaluated.append(tweet_id)
+                print("*************************************************************************************")
+
+        return path_for_table_dict
+
+
+
+
 
 
 
