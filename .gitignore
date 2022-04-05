@@ -3,6 +3,9 @@ brexit-env/
 key_opinion_leaders_tweets_tables_beta/
 conversation_trees/
 *.code-workspace
+*.csv
+*.xlsx
+Qualitative Data/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
