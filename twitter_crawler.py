@@ -1371,12 +1371,14 @@ class TwitterCrawler():
             try:
                 a = pd.json_normalize(json_response["data"])
                 a["id_new"] = "id: " + a["id"].astype("string")
+                a["conv_id_new"] = "coversation_id: " + a["conversation_id"].astype("string")
+                a["author_id_new"] = "author_id: " + a["author_id"].astype("string")
 
                 b = pd.json_normalize(json_response["includes"], ["users"]).add_prefix("users.")
 
                 df_tweets_i = pd.merge(a, b, left_on="author_id", right_on="users.id")
 
-                list_of_cols_to_add = ['id', "id_new",'text', 'conversation_id', 'in_reply_to_user_id','reply_settings', 'referenced_tweets', 'lang', 'created_at',
+                list_of_cols_to_add = ['id', "id_new", "conv_id_new", "author_id_new", 'text', 'conversation_id', 'in_reply_to_user_id','reply_settings', 'referenced_tweets', 'lang', 'created_at',
         'author_id', 'source', 'entities.mentions', 'public_metrics.retweet_count', 'public_metrics.reply_count',
         'public_metrics.like_count', 'public_metrics.quote_count', 'users.username', 'users.created_at', 'users.id', 'users.description',
             'users.verified', 'users.name', 'users.public_metrics.followers_count','users.public_metrics.following_count',
