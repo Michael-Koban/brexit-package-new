@@ -1,9 +1,15 @@
+
+
+
 import requests
 import os
 import json
 import pandas as pd
 import csv , datetime, unicodedata, time, datetime, tweeterid #dateutil.parserm, 
+import gensim
 from datetime import datetime
+from collections import Counter
+import openpyxl
 
 class TwitterCrawler():
     """Summary of class here.
@@ -275,7 +281,8 @@ class TwitterCrawler():
             if counter_loops > 1:
                 next_token = json_response["meta"]["next_token"]
                 query_params["next_token"] = next_token
-                print("token to insert:",next_token)
+                if verbose_10:
+                    print("token to insert:",next_token)
             #if the returned amount of tweets is getting close to the limit number, we need to alter the max_result,
             #so we won't get tweets beyond what we asked
             
@@ -354,8 +361,8 @@ class TwitterCrawler():
             if "next_token" in json_response["meta"]:
                 if (verbose_10 == True and counter_loops % 20 == 1):
                     print(counter_loops, "Got from twitter", json_response["meta"]["result_count"], "tweets, and there are more tweets of that user to get, I am bringing more tweets!\n")
-                elif verbose_10 == False:
-                    print(counter_loops, "Got from twitter", json_response["meta"]["result_count"], "tweets, and there are more tweets of that user to get, I am bringing more tweets!\n")
+                #elif verbose_10 == False:
+                    #print(counter_loops, "Got from twitter", json_response["meta"]["result_count"], "tweets, and there are more tweets of that user to get, I am bringing more tweets!\n")
                 next_token = json_response["meta"]["next_token"]
                 query_params["next_token"] = next_token
                 next_tokens.append(next_token)
@@ -383,7 +390,8 @@ class TwitterCrawler():
 
  #The following cose check wheter the user_name is a list, if not it turnes it into a list
       
-    def return_tweets_of_key_opinion_leaders(self, query="", dir_name="tweets", user_names =None, \
+
+    def return_tweets_of_key_opinion_leaders(self, query="",dir_name="tweets", user_names =None, \
         start_time = "2015-12-7T00:00:00Z", end_time = "2021-12-26T00:00:00Z",
         max_results = 10, evaluate_last_token = False, \
             limit_amount_of_returned_tweets = 10000000, verbose_10 = False):
@@ -402,11 +410,11 @@ class TwitterCrawler():
                 try:
 
                     json_response_list, num_of_returned_tweets,next_tokens = self.__return_tweets_of_key_opinion_leader(query=query, user_name=user_name,
-                                                            start_time = start_time,
+                                                            start_time = start_time, evaluate_last_token = evaluate_last_token,
                                                             end_time = end_time,
-                                                            max_results = max_results,
+                                                            max_results = max_results, dir_name=dir_name,
                                                             limit_amount_of_returned_tweets = limit_amount_of_returned_tweets,
-                                                                                                                verbose_10 = True)
+                                                                                                                verbose_10 = verbose_10)
                     print(num_of_returned_tweets)
                     if num_of_returned_tweets > 0:
                         names_evaluated.append(name)
@@ -1500,9 +1508,230 @@ class TwitterCrawler():
         return path_for_table_dict
 
 
+############################################### Filter function ##################################
+    """
+    # Function filter tweets
 
+    We read numerous amount of tweets, comments, retweets and quotes from twitter. 
+    Now we wish to create a function that, given a dataframe with  tweets / comments / quotes it will enable scoring them.
+    The scoring will be based on the following parameters:
 
+    1. The author - if he is one of the KOPs - K points
+    2. The time - if it is in the day of key event - K points
+    3. The text - if it contains key words - K points
 
+    ### Notes:
+    + Note that you can't mix tables with tweets / comments / quotes - this is because they have different amount of columns. You need to process the tweets, comments and quotes table separately
+
+    + **The key-events table and the KOP table - MUST BE OF XLSX TYPE!!**
+
+    ### The Filter function gets as input:
+
+    + 1. **dir_with_all_tweets** - The location / name of dir (if the dir is in the same location of the jupyter file) of all the tweets table that we want to read into the function (this is important as all the csv tweet tables that will be located in this location will be read into the function).
+
+    + 2. **score_for_KOP** = By default = 5. This argument controls the **weight** given to tweet with author id of **Key Opinion Leader**
+
+    + 3. **score_for_key_event** = By default = 5. This argument controls the **weight** given to tweet that was published in **key event day**.
+
+    + 4. **score_for_key_words** = By default = 5. This argument controls the **weight** given to **each** **key-word** that is located in the tweet.
+
+    + 5. **key_words** = By default = ["brexit", "eu", "deal"]. This argument controls the **Key words** to search in each tweet that are related to the brexit. Tweets with high amount of those words are assumed to be important.
+
+    + 6. **threshold_score** - By default = 10. This is a very important argument. It controls the minimum score that a tweet must get in order to be returned in the filtered tweets table. Any tweet with score under this value won't be included in the filtered table
+
+    + 7. **KOP_excel_name** - The name of the excel file (**xlsx format**) that contains the Key Opinion Leaders
+
+    + 8. **key_events_excel_name** - The name of the excel file (**xlsx format**) that contains the key events data
+
+    + 9. **stop_words_to_add** = A list with all the additional words you wish the function to handle as stop words (those words will be removed from each list of tokens for each tweet).
+
+    + 10. **stop_words_file_name** = The name of the text file that contains all the stopwords. Note that if it doesn't exist, the function will go to "https://gist.githubusercontent.com/sebleier/554280/raw/7e0e4a1ce04c2bb7bd41089c9821dbcf6d0c786c/NLTK's%2520list%2520of%2520english%2520stopwords" - to find the stopwords
+
+    + 11. **verbose** = by default = True. If True than the function will print its progress (suggested!)
+
+    ### The function returns:
+
+    + **tweets_table_filtered** - The filtered tweets table is a table containing all the tweets that their score is higher than the `threshold_score`
+
+    + **tweets_table** - The preprocessed tweets table with all the tweets - This table is identical to the `tweets_table_filtered` except that it also included tweets with score under the `threshold_score`
+
+    + **csv_files_evaluated** = a list with all the **csv** files that the function read and add to the tweets table (the files are read from the location you provided in the argument: `dir_with_all_tweets`)
+    """
+
+    def filter_tweets_Brexit(self, dir_with_all_tweets, score_for_KOP = 5, score_for_key_event = 5, score_for_key_words = 5,
+                            key_words = ["brexit", "eu", "deal"], threshold_score = 10,
+                            KOP_excel_name = "KOP brexit.xlsx",
+                            key_events_excel_name = "Brexit_key_events.xlsx",
+                            stop_words_to_add = ["https"], stop_words_file_name = "stopwords.txt",
+                            verbose = True):
+        start_fun_time = time.time()
+        ############# step 1 - Reading the tweets data #############
+        if verbose: print("Step 1: Reading all the csv files")
+        tweets_tables = []
+        csv_files_evaluated = []
+        for root,dirs,files in os.walk(dir_with_all_tweets):
+            for file in files:
+                if file.endswith(".csv"): #if the file is csv
+                    csv_files_evaluated.append(file)
+                    file_location = os.path.join(dir_with_all_tweets, file)
+                    tweets_tables.append(pd.read_csv(file_location))
+
+        tweets_table = pd.concat(tweets_tables)
+        
+        ############# step 2 - Reading events data #############
+        if verbose: print("Step 2: Reading The Events Excel File")
+        dir_path_for_events_table = os.path.join(key_events_excel_name)
+        events_table = pd.read_excel(dir_path_for_events_table)
+        events_table = events_table.drop(labels = ["tweets", "Arguments", "Index"], axis = 1)
+        #display(events_table.head())
+        
+        ############# step 3 - Reading KOP data #############
+        if verbose: print("Step 3: Reading and preprocessing Key Opinion Leaders data")
+        dir_path_for_KOP_table = os.path.join(KOP_excel_name) 
+        KOP_table = pd.read_excel(dir_path_for_KOP_table)
+        try:
+            KOP_table.rename(columns = {'Unnamed: 0':'KOP_num',
+                                        "Born In":"Born_in",
+                                        "Twitter acount name" : "twitter_user_name",}, inplace = True)
+            #drop unnecessary columns
+            KOP_table = KOP_table.drop(labels = ["Unnamed: 7", "Source"], axis = 1)
+        except: print()
+        
+        #remove KOP without twitter account name
+        KOP_table = KOP_table[KOP_table['twitter_user_name'].notna()]
+        #remove the "@" at the begining of some user names
+        KOP_table["clean_user_name"] = KOP_table["twitter_user_name"].apply(lambda x: x.replace("@", ""))
+
+        def take_all_except_first_char(x):
+            try:
+                author_id = tweeterid.handle_to_id(x)
+            except:
+                author_id = "-"
+            return author_id
+
+        KOP_table["author_id"] = KOP_table["clean_user_name"].apply(take_all_except_first_char)
+
+        ############# step 4 - Stop-words #############
+        if verbose: print("Step 4: Reading stop words data and adding your stop words")
+        stopwords_file_name = os.path.join(stop_words_file_name)
+        stopwords_url = "https://gist.githubusercontent.com/sebleier/554280/raw/7e0e4a1ce04c2bb7bd41089c9821dbcf6d0c786c/NLTK's%2520list%2520of%2520english%2520stopwords"
+
+        if not os.path.isfile(stopwords_file_name):
+            stopwords = requests.get(stopwords_url).text.split()
+            with open(stopwords_file_name,'w+t', encoding='utf-8') as out_file:
+                out_file.write(' '.join(stopwords))
+        else: 
+            with open(stopwords_file_name,'rt', encoding='utf-8') as in_file:
+                stopwords = in_file.readline().split()
+        stopwords = set(stopwords)
+
+        #### Adding stopWords
+        for word_i in stop_words_to_add:
+            stopwords.add(word_i)
+            
+        ############# step 5 - Preprocess the tweets table for scoring #############
+        if verbose: print("\nStep 5: Preprocess the tweets table for scoring:\nRemoving Stop words\
+        | bigram, trigram, forthgram | merging the tweets table with the KOP and Events tables | ")
+        
+        start_time = time.time()
+        #using gensim function to split the text into tokens
+        tweets_table["text_tokens"] = tweets_table["text"].apply(gensim.utils.simple_preprocess,{"deacc":True, "min_len":2,"max_len":25})
+
+        #remove stopwords:
+        def remove_stopwords(tokens, stopwords):
+            return [token for token in tokens if token not in stopwords]
+        tweets_table['text_tokens'] = tweets_table['text_tokens'].apply(remove_stopwords, stopwords=stopwords)
+
+        ################################## add bygrams to the tokens
+        #print(f"connector words: {gensim.models.phrases.ENGLISH_CONNECTOR_WORDS}")
+        ## train bygram model
+        bigram = gensim.models.Phrases(tweets_table['text_tokens'], min_count=2, threshold=2, connector_words=gensim.models.phrases.ENGLISH_CONNECTOR_WORDS)
+        bigram_model = gensim.models.phrases.Phraser(bigram)
+        if verbose: print(f"found {len(bigram_model.phrasegrams)} bigrams")
+        # bigram_model.phrasegrams #the bygrams the model found
+        tweets_table['text_tokens'] = tweets_table['text_tokens'].apply(lambda x: bigram_model[x])
+        ###### add trigram to the tokens
+        trigram = gensim.models.Phrases(tweets_table['text_tokens'], min_count=2, threshold=1, connector_words=gensim.models.phrases.ENGLISH_CONNECTOR_WORDS)
+        trigram_model = gensim.models.phrases.Phraser(trigram)
+        if verbose: print(f"found {len(trigram_model.phrasegrams)} trigram")
+        #trigram_model.phrasegrams #the trigram that the model found
+        tweets_table['text_tokens'] = tweets_table['text_tokens'].apply(lambda x: trigram_model[x])
+        ############################################################################
+        ###### add forthgram to the tokens
+        forthgram = gensim.models.Phrases(tweets_table['text_tokens'], min_count=2, threshold=6, connector_words=gensim.models.phrases.ENGLISH_CONNECTOR_WORDS)
+        forthgram_model = gensim.models.phrases.Phraser(forthgram)
+        if verbose: print(f"found {len(forthgram_model.phrasegrams)} forthgram")
+        #forthgram_model.phrasegrams #the trigram that the model found
+        tweets_table['text_tokens'] = tweets_table['text_tokens'].apply(lambda x: forthgram_model[x])
+        ############################################################################
+        ### add tweet date column
+        def take_only_10_first_char(x):
+            return(x[0:10])
+        tweets_table["created_at_date"] = tweets_table["created_at"].apply(take_only_10_first_char)
+        tweets_table["created_at_date"] = pd.to_datetime(tweets_table["created_at_date"]) 
+
+        ### add column is_in_special_date that checks wheter the tweet was published in a special event day
+        tweets_table['is_in_special_date'] = tweets_table['created_at_date'].apply(lambda x : pd.Series(x).isin(events_table["Date"]).any())
+
+        ### Joining the event table so we can get additional information for the special events
+        tweets_table = tweets_table.merge(events_table, left_on = "created_at_date", right_on = "Date", how = "left")
+        tweets_table.rename(columns = {'Date':'Event_Date'}, inplace = True)
+        tweets_table['Event_Date'] = tweets_table['Event_Date'].fillna("No-Event")
+
+        ### Joining the KOP table so we can get additional information for the KOP
+        tweets_table = tweets_table.merge(KOP_table, left_on = "author_id", right_on = "author_id", how = "left")
+        try:
+            tweets_table['KOP_num'] = tweets_table['KOP_num'].fillna("No-KOP")
+            tweets_table['Index'] = tweets_table['Index'].fillna("No-KOP")
+            tweets_table['Name'] = tweets_table['Name'].fillna("No-KOP")
+            tweets_table['Born_in'] = tweets_table['Born_in'].fillna("No-KOP")
+            tweets_table['Role'] = tweets_table['Role'].fillna("No-KOP")
+            tweets_table['Place'] = tweets_table['Place'].fillna("No-KOP")
+        except: print()
+        
+        if verbose: print("\nFinish preprocessing the tweets table, it took:", round(time.time() - start_time,3), "seconds")
+        
+        ############# step 6 - Scoring #############
+        if verbose: print("Step 6: Scoring the Tweets")
+
+        KOP_ids = list(set(KOP_table.author_id))
+
+        ### the following scorer - count the number of times the key words apprear in a certain text. If a certain word (brexit)
+        # appear more than once, it will be counted twice
+        def scorer_keywords_brexit(tweet_tokens, key_words):
+            #scoring the keywords:
+            count_key_words = 0
+            for word in key_words:
+                count_key_words += tweet_tokens.count(word)
+            return count_key_words
+        ##########################################################################################################
+        def scorer_KOP_brexit(author_id, KOP_ids):
+            if author_id in KOP_ids:
+                score = 1
+            else:
+                score = 0
+            return score
+        ##########################################################################################################
+        ### scoring key-words
+        tweets_table["score_key_words"] = tweets_table['text_tokens'].apply(scorer_keywords_brexit, key_words = key_words)
+
+        #scoring KOP: if the author is KOP then the score in this column will be 1, else 0
+        tweets_table["score_KOP"] = tweets_table['author_id'].apply(scorer_KOP_brexit, KOP_ids = KOP_ids)
+
+        ### scoring events - column is_in_special_date
+
+        #tweets_table["total_score"]: adding the weights of each scorer
+        tweets_table["total_score"] = score_for_key_words*tweets_table['score_key_words'] + score_for_key_event*tweets_table["is_in_special_date"] + score_for_KOP*tweets_table["score_KOP"]
+        
+        #Geting a table with all the tweets that passed the score threshold
+        tweets_table_filtered = tweets_table[tweets_table["total_score"]>=threshold_score].copy()
+        #Sort the filtered table by score such that the tweets with the highest score will be first
+        tweets_table_filtered.sort_values(by = "total_score", ascending=False, inplace=True)
+        
+        print("\nFinish!\nTotal time:", round(time.time() - start_fun_time,3),
+            "Seconds (",round((time.time() - start_fun_time)/60,3), "Minutes)")
+
+        return (tweets_table_filtered, tweets_table, csv_files_evaluated)
 
 
 
