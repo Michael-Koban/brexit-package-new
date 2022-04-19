@@ -117,37 +117,31 @@ class TwitterCrawler():
     #     return response.json()
     
     def get_url_by_tweet_id(tweet_id: str):
-        """ Connect to Twitter API via a endpoint
+        """ Given tweet id - get the twitter url
 
-        Parameters
-        ----------
-        sound : str, optional
-            The sound the animal makes (default is None)
-
-        Raises
+        ### Parameters
         ------
-        NotImplementedError
-            If no sound is set for the animal or passed in as a
-            parameter.
+        + tweet_id : str
+
         """
         return "https://twitter.com/anyuser/status/" + str(tweet_id)
 
     def search_by_tweet_id(self, tweet_id: str):
-        """ search url for idtweet - App rate limit: 
-        300 requests per 15-minute window shared among all users of your app
-        User rate limit (OAuth 1.0a): 900 requests per 15-minute window per each authenticated user
+        """ ## search tweet by tweet-id
+         
+        + link to twitter-developer page regarding this capability:
+        https://developer.twitter.com/en/docs/twitter-api/tweets/lookup/api-reference/get-tweets-id
+
+        ### App rate limit: 
+        900 requests per 15-minute window per each authenticated user
 
 
-        Parameters
+        ### Parameters
         ----------
-        sound : str, optional
-            The sound the animal makes (default is None)
-
-        Raises
-        ------
-        NotImplementedError
-            If no sound is set for the animal or passed in as a
-            parameter.
+        - tweet_id : str --> The twitter Id of the tweet you wish to get
+        
+        ### Classic Use cases
+        When you have a twet id and you want to get all the available data on this tweet - the text, data about the author, tweet metrics, etc.
         """
     
         search_url = "https://api.twitter.com/2/tweets/:id"
@@ -163,23 +157,37 @@ class TwitterCrawler():
         return json_response
 
     def search_recent_by_keyword(self, keyword: str, start_date, end_date, max_results = 10):
-        """ search url for idtweet - App rate limit: 
-        300 requests per 15-minute window shared among all users of your app
-        User rate limit (OAuth 1.0a): 900 requests per 15-minute window per each authenticated user
-         ONLY FROM LAST WEEK !@#!@#!@#!@#@#!@#!@#!@
+        """ ## search tweets by query
+        
+This function enalbes look for tweets by providing start + end date and building a query.\n
+You can see the full documentation on how to build a query (what to pass in the `keywork` argument) in the following link:\n
+https://developer.twitter.com/en/docs/twitter-api/tweets/counts/integrate/build-a-query
 
-        Parameters
-        ----------
-        sound : str, optional
-            The sound the animal makes (default is None)
++ link to twitter-developer page regarding this capability:\n
+https://developer.twitter.com/en/docs/twitter-api/tweets/search/api-reference/get-tweets-search-recent
+https://developer.twitter.com/en/docs/twitter-api/tweets/search/api-reference/get-tweets-search-all
 
-        Raises
-        ------
-        NotImplementedError
-            If no sound is set for the animal or passed in as a
-            parameter.
+### App rate limit: 
+- App rate limit (OAuth 2.0 App Access Token): 300 requests per 15-minute window shared among all users of your app
+- App rate limit (OAuth 2.0 App Access Token): 1 request per second shared among all users of your app
+
+Parameters
+----------
+keyword : str
+start_date = The start date is the date that from it the function will look and rerieve tweets.\nNote that the format of the start time should be: "2015-12-7T00:00:00Z"
+end_date = The end date is the date that till it the function will look and rerieve tweets.\nNote that the format of the end time should be: "2021-12-7T00:00:00Z"
+
+max_results = The max number of tweets to retrieve in a given call. Must be an integer between 10 to 500.
+
         """
-        search_url = "https://api.twitter.com/2/tweets/search/recent" 
+        search_url = "https://api.twitter.com/2/tweets/search/all" 
+        #handling case where the user entered a mex_result that is not between 10 and 100
+        if max_results > 500:
+            max_results = 500
+            print('max_results can not be greater than 500, changed to 500')
+        if max_results < 10:
+            max_results = 10
+            print('max_results can not be smaller than 10, changed to 10')
 
         #change params based on the endpoint you are using
         query_params = {'query': keyword,
@@ -208,7 +216,14 @@ class TwitterCrawler():
 ):
   
         search_url = "https://api.twitter.com/2/tweets/search/all" #endpoint use to collect data from
-
+        #handling case where the user entered a mex_result that is not between 10 and 100
+        if max_results > 100:
+            max_results = 100
+            print('max_results can not be greater than 100, changed to 100')
+        if max_results < 10:
+            max_results = 10
+            print('max_results can not be smaller than 10, changed to 10')
+        
         import os.path
         try:
             os.mkdir(dir_name)
@@ -407,6 +422,34 @@ class TwitterCrawler():
         start_time = "2015-12-7T00:00:00Z", end_time = "2021-12-26T00:00:00Z",
         max_results = 10, evaluate_last_token = False, \
             limit_amount_of_returned_tweets = 10000000, verbose_10 = False):
+        """ ## Return Tweets of Key Opinion leaders
+                
+        This function enalbes getting all the tweets written by a list of twitter accounts in a certain time-frame.\n
+        
+        + link to twitter-developer page regarding this capability:\n
+        https://developer.twitter.com/en/docs/twitter-api/tweets/search/api-reference/get-tweets-search-recent
+
+
+        ### App rate limit: 
+        - App rate limit (OAuth 2.0 App Access Token): 450 requests per 15-minute window shared among all users of your app
+        - User rate limit (OAuth 2.0 user Access Token): 180 requests per 15-minute window per each authenticated user
+
+        Parameters
+        ----------
+        query : str --> You can see the full documentation on how to build a query (what to pass in the `query` argument) in the following link:\n
+        https://developer.twitter.com/en/docs/twitter-api/tweets/counts/integrate/build-a-query
+
+        start_date = The start date is the date that from it the function will look and rerieve tweets.\nNote that the format of the start time should be: "2015-12-7T00:00:00Z"
+        end_date = The end date is the date that till it the function will look and rerieve tweets.\nNote that the format of the end time should be: "2021-12-7T00:00:00Z"
+
+        max_results = The max number of tweets to retrieve in a given call. Must be an integer between 10 to 100.
+
+        """
+
+
+
+
+
 
             if type(user_names) != list:
                 user_names = [user_names]
