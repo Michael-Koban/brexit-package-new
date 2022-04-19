@@ -23,7 +23,7 @@ class TwitterCrawler():
     """ 
      
     def __init__(self, bearer_token: str):
-        """Inits SampleClass with blah."""
+        """Inits SampleClass with the academic bearer_token."""
         self.bearer_token = bearer_token
         os.environ['TOKEN'] = self.bearer_token
         self.headers = {"Authorization": "Bearer {}".format(self.bearer_token)}
@@ -52,28 +52,40 @@ class TwitterCrawler():
 
     def __connect_to_endpoint(self, url: str, params: dict, next_token: str  = None,
      sleep_time:int = 3, num_of_trails = 10, verbose:bool = False, is_retweet = False):
+        """
+        ### connect_to_endpoint
+        This Function enables concatinating the twitter endpoint url with the search parameters and search for the relevant information
 
-            if is_retweet:
-                params['pagination_token'] = next_token 
-            else:
-                params['next_token'] = next_token   #params object received from create_url function
+        ### Arguemnts:
+            - url: One of twitter endpoints URL
+            - params: dict with the query params. The acceptable params can be found in twitter developer documentation
+            - next_token: the token is a distinct hash key that categorizes search pages in twitter. In some of the endpoints calls, you get a token indicating the place you "stopped" in. If you wish to get data from that stopped point you can use that given token.
+            - sleep_time: int, by default  = 3 seconds. If the function got an error from twitter, it sometimes because you tried retirve data too quickly (multiple calls whithin less than 1 second), so the function can activate the sleep command for a few seconds and right after that try calling twitter again.
+            - num_of_trails: int, by default  = 10 tries. If the function got an error from twitter it will try waiting K seconds (K = sleep_time = 3) and it will do this N times (N = num_of_trails)
+            - vebose: bool, by default  = False. If True then the function will print the status code it gets and will print when it goes sleeping
+            - is_retweet: bool, by default  = False. For some of the endpoints there is a new name for "next_token" - "pagination_token". Example for this cases is the End point for retweets or quotes. So for all the endpoints that uses the "pagination_token", we need to pass the connect_to_endpoint function "True" in this arguement.
+        """
+        if is_retweet:
+            params['pagination_token'] = next_token 
+        else:
+            params['next_token'] = next_token   #params object received from create_url function
 
-            for i in range(num_of_trails):
+        for i in range(num_of_trails):
 
-                if i > num_of_trails//2: 
-                    print(f"Failed to connect {i} times, going to sleep for 15 minutes..")
-                    time.sleep(15*60) # sleep for 15 minutes
+            if i > num_of_trails//2: 
+                print(f"Failed to connect {i} times, going to sleep for 15 minutes..")
+                time.sleep(15*60) # sleep for 15 minutes
 
-                response = requests.request("GET", url, headers = self.headers, params = params)
-                if verbose: print(f"Trail #{i} Response Code: " + str(response.status_code))
+            response = requests.request("GET", url, headers = self.headers, params = params)
+            if verbose: print(f"Trail #{i} Response Code: " + str(response.status_code))
 
-                if response.status_code == 200: return response.json()
-                
-                if response.status_code == 429:
-                    if verbose: print(f"Try sleeping for {sleep_time} seconds")
-                    time.sleep(sleep_time)
+            if response.status_code == 200: return response.json()
+            
+            if response.status_code == 429:
+                if verbose: print(f"Try sleeping for {sleep_time} seconds")
+                time.sleep(sleep_time)
 
-            raise Exception(response.status_code, response.text)
+        raise Exception(response.status_code, response.text)
 
     # def __connect_to_endpoint(self, url: str, params: dict, next_token = None, verbose = True):
     #     """ Connect to Twitter API via a endpoint

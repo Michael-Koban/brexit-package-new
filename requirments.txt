@@ -39,3 +39,5 @@ traitlets==5.1.1
 tweeterid==1.0.0
 urllib3==1.26.8
 wcwidth==0.2.5
+gensim==4.1.2
+openpyxl==3.0.9
