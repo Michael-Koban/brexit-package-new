@@ -5,11 +5,16 @@ import requests
 import os
 import json
 import pandas as pd
-import csv , datetime, unicodedata, time, datetime, tweeterid #dateutil.parserm, 
+import numpy as np
+import csv , datetime, unicodedata, time, tweeterid #dateutil.parserm,
 import gensim
+import openpyxl
+import json
+
+from os import path
 from datetime import datetime
 from collections import Counter
-import openpyxl
+from inputimeout import inputimeout, TimeoutOccurred
 
 class TwitterCrawler():
     """Summary of class here.
@@ -20,8 +25,8 @@ class TwitterCrawler():
     Attributes:
         likes_spam: A boolean indicating if we like SPAM or not.
         eggs: An integer count of the eggs we have laid.
-    """ 
-     
+    """
+
     def __init__(self, bearer_token: str):
         """Inits SampleClass with the academic bearer_token."""
         self.bearer_token = bearer_token
@@ -66,13 +71,13 @@ class TwitterCrawler():
             - is_retweet: bool, by default  = False. For some of the endpoints there is a new name for "next_token" - "pagination_token". Example for this cases is the End point for retweets or quotes. So for all the endpoints that uses the "pagination_token", we need to pass the connect_to_endpoint function "True" in this arguement.
         """
         if is_retweet:
-            params['pagination_token'] = next_token 
+            params['pagination_token'] = next_token
         else:
             params['next_token'] = next_token   #params object received from create_url function
 
         for i in range(num_of_trails):
 
-            if i > num_of_trails//2: 
+            if i > num_of_trails//2:
                 print(f"Failed to connect {i} times, going to sleep for 15 minutes..")
                 time.sleep(15*60) # sleep for 15 minutes
 
@@ -80,7 +85,7 @@ class TwitterCrawler():
             if verbose: print(f"Trail #{i} Response Code: " + str(response.status_code))
 
             if response.status_code == 200: return response.json()
-            
+
             if response.status_code == 429:
                 if verbose: print(f"Try sleeping for {sleep_time} seconds")
                 time.sleep(sleep_time)
@@ -105,7 +110,7 @@ class TwitterCrawler():
     #     response = requests.request("GET", url, headers = self.headers, params = params)
     #     if verbose == True:
     #         print("Endpoint Response Code: " + str(response.status_code))
-    
+
     #     if response.status_code == 429:
     #         print(response.text)
     #         print("try sleeping for 2 seconds")
@@ -115,7 +120,7 @@ class TwitterCrawler():
     #     if response.status_code != 200:
     #         raise Exception(response.status_code, response.text)
     #     return response.json()
-    
+
     def get_url_by_tweet_id(tweet_id: str):
         """ Given tweet id - get the twitter url
 
@@ -128,22 +133,22 @@ class TwitterCrawler():
 
     def search_by_tweet_id(self, tweet_id: str):
         """ ## search tweet by tweet-id
-         
+
         + link to twitter-developer page regarding this capability:
         https://developer.twitter.com/en/docs/twitter-api/tweets/lookup/api-reference/get-tweets-id
 
-        ### App rate limit: 
+        ### App rate limit:
         900 requests per 15-minute window per each authenticated user
 
 
         ### Parameters
         ----------
         - tweet_id : str --> The twitter Id of the tweet you wish to get
-        
+
         ### Classic Use cases
         When you have a twet id and you want to get all the available data on this tweet - the text, data about the author, tweet metrics, etc.
         """
-    
+
         search_url = "https://api.twitter.com/2/tweets/:id"
         search_url = search_url.replace(":id", tweet_id)
         #change params based on the endpoint you are using
@@ -158,7 +163,7 @@ class TwitterCrawler():
 
     def search_recent_by_keyword(self, keyword: str, start_date, end_date, max_results = 10):
         """ ## search tweets by query
-        
+
 This function enalbes look for tweets by providing start + end date and building a query.\n
 You can see the full documentation on how to build a query (what to pass in the `keywork` argument) in the following link:\n
 https://developer.twitter.com/en/docs/twitter-api/tweets/counts/integrate/build-a-query
@@ -167,7 +172,7 @@ https://developer.twitter.com/en/docs/twitter-api/tweets/counts/integrate/build-
 https://developer.twitter.com/en/docs/twitter-api/tweets/search/api-reference/get-tweets-search-recent
 https://developer.twitter.com/en/docs/twitter-api/tweets/search/api-reference/get-tweets-search-all
 
-### App rate limit: 
+### App rate limit:
 - App rate limit (OAuth 2.0 App Access Token): 300 requests per 15-minute window shared among all users of your app
 - App rate limit (OAuth 2.0 App Access Token): 1 request per second shared among all users of your app
 
@@ -180,8 +185,8 @@ end_date = The end date is the date that till it the function will look and reri
 max_results = The max number of tweets to retrieve in a given call. Must be an integer between 10 to 500.
 
         """
-        search_url = "https://api.twitter.com/2/tweets/search/all" 
-        #handling case where the user entered a mex_result that is not between 10 and 100
+        search_url = "https://api.twitter.com/2/tweets/search/all"
+        #handling case where the user entered a max_result that is not between 10 and 500
         if max_results > 500:
             max_results = 500
             print('max_results can not be greater than 500, changed to 500')
@@ -201,29 +206,28 @@ max_results = The max number of tweets to retrieve in a given call. Must be an i
                         'next_token': {}}
 
         json_response = self.__connect_to_endpoint(url= search_url, params = query_params)
-        return json_response 
-    
+        return json_response
+
 ###self.__connect_to_endpoint2(self, search_url, query_params, next_token = next_token, verbose = False)
-    
 
-
+#################################################################################################################
     def __return_tweets_of_key_opinion_leader(self, query="", user_name=None,
                                         start_time = "2015-12-7T00:00:00Z",
                                         end_time = "2021-12-26T00:00:00Z",
                                         max_results = 10, evaluate_last_token = False,
                                         limit_amount_of_returned_tweets = 10000000,
-                                       verbose_10 = False, dir_name = "key_opinion_leaders_tweets_tables_beta"
-):
-  
+                                       verbose_10 = False, dir_name = "key_opinion_leaders_tweets_tables_beta"):
+
         search_url = "https://api.twitter.com/2/tweets/search/all" #endpoint use to collect data from
-        #handling case where the user entered a mex_result that is not between 10 and 100
-        if max_results > 100:
-            max_results = 100
-            print('max_results can not be greater than 100, changed to 100')
+        
+        #handling case where the user entered a max_result that is not between 10 and 500
+        if max_results > 500:
+            max_results = 500
+            print('max_results can not be greater than 500, changed to 500')
         if max_results < 10:
             max_results = 10
             print('max_results can not be smaller than 10, changed to 10')
-        
+        #creating a directory tat will contain the csv file + the log directory of the Key Opinion Leader
         import os.path
         try:
             os.mkdir(dir_name)
@@ -233,7 +237,7 @@ max_results = The max number of tweets to retrieve in a given call. Must be an i
 
         if user_name is not None:
             query = str(query) + " from:" + str(user_name)
-            try:
+            try: #displaying with print the start and end time + the user name that the function will try to retirve tweets
                 display_start_time = datetime.strptime(start_time.split("T")[0], "%Y-%m-%d").strftime("%d-%m-%Y")
                 display_end_time = datetime.strptime(end_time.split("T")[0], "%Y-%m-%d").strftime("%d-%m-%Y")
             except:
@@ -242,30 +246,30 @@ max_results = The max number of tweets to retrieve in a given call. Must be an i
             print("Bringing all the tweets of the user:", user_name, "from:", display_start_time, "to", display_end_time)
             print()
 
-        ##### the log dir
+        ##### Creating the log directory (that will contain 3 files: The token file, the retriving tweets streem and the full json file)
         import os.path
-        #dir_name = "key_opinion_leaders_tweets_tables_beta"
-        dir_name_beta = "key_opinion_leaders_tweets_tables_beta"
-        dir_log_name = os.path.join(dir_name_beta, "log_key_opinion_leaders") 
-
-        # try:
-        #     os.mkdir(dir_name)
-        #     print("creating directory", dir_name, "to insert all the tables of all the key opinion leaders")
-        # except:
-        #     print("The dir", dir_name ,"already exist")
+        dir_log_name = os.path.join(dir_name, "log_key_opinion_leaders")
+        
+        # Try creating the directory for the logs, if the path exist don't create a new one. Print in either case What happened
         try:
             os.mkdir(dir_log_name)
             print("creating directory", dir_log_name, "to insert all the logs of the key opinion leaders")
         except:
             print("The dir", dir_log_name ,"already exist")
-        ########################
+        ######################## creating a path for the specific user that we wish to retirve his tweets
         path_for_log_dir_of_certain_user = os.path.join(dir_log_name, user_name)
+        
+        # Try creating the directory for the specific user, if the path exist don't create a new one. Print in either case What happened
         try:
             os.mkdir(path_for_log_dir_of_certain_user)
             print("creating directory", path_for_log_dir_of_certain_user,"in the dir",dir_log_name, "to insert all the logs of the key opinion leader", user_name)
         except:
             print("The dir", path_for_log_dir_of_certain_user ,"already exist")
-            
+        ### creating the log-text-file of the "retriving_tweets_streem" This log file will contain a time-stamp
+        # of the time you activated the function, and in each call to twitter API it will write in that log-file
+        # the number of tweets that the function retirved in that call + the totla number of tweets retrived so far.
+        # With this text file you can follow up in any time the function runs what is the status of the call - 
+        # you can see how many tweets have been collected on a specifc user and know that the function works fine.
         path_for_dir_retriving_tweets_streem = os.path.join(path_for_log_dir_of_certain_user, 'retriving_tweets_streem.txt')
         with open(path_for_dir_retriving_tweets_streem, 'a') as f:
             from datetime import datetime
@@ -273,19 +277,20 @@ max_results = The max number of tweets to retrieve in a given call. Must be an i
             current_time = now.strftime("%H:%M:%S (Date: %d.%m.%y)")
             current_time = "Current Time: " + current_time + "   *****************************************   "
             f.write(current_time + '\n\n')
-            
-        ########### If the token file exist already, then take the last token available, else start from token 1  ############ 
-        tokens_location = os.path.join(dir_log_name, user_name, "tokens.txt") 
+
+        # Opening the Tokens text-file (if not exist)
+        ########### If the token file exist already, then take the last token available, else start from token 1  ############
+        tokens_location = os.path.join(dir_log_name, user_name, "tokens.txt")
 
         if (evaluate_last_token == True and os.path.isfile(tokens_location) == True):
             a_file = open(tokens_location, "r")
             lines = a_file.readlines()
             last_lines = lines[-2]
             next_token = last_lines[0:-1]
-            a_file.close()    
+            a_file.close()
         else:
             next_token = None
-            
+
         ################ Add a time stamp ########################################
         path_for_dir_tokens = os.path.join(path_for_log_dir_of_certain_user, 'tokens.txt')
         with open(path_for_dir_tokens, 'a') as f:
@@ -294,15 +299,16 @@ max_results = The max number of tweets to retrieve in a given call. Must be an i
             current_time = now.strftime("%H:%M:%S (Date: %d.%m.%y)")
             current_time = "Current Time: " + current_time + "   *****************************************   "
             f.write(current_time+ '\n\n')
-            
-        ##########################################################################################
 
-        continue_searching = True
-        json_response_list = []
-        next_tokens = []
-        num_of_returned_tweets = 0
-        counter_loops = 0
-        
+        ############################################# The main for loop #############################################
+
+        continue_searching = True #logical variable that controls the for loop, as long as it is True, the function will keep trying to retrive tweets
+        json_response_list = [] #list containing all the json responses the function got. In each loop we are
+        #saving that list in the log-json file (so if there was a problem in a certain loop, we would have all the jsons till that problematic loop)
+        next_tokens = [] #list containing all the tokens
+        num_of_returned_tweets = 0 # counter of returned tweets
+        counter_loops = 0 #counter of the loops - the number of calls to twitter API
+
         while continue_searching == True and num_of_returned_tweets < limit_amount_of_returned_tweets:
             counter_loops +=1
             if counter_loops > 1:
@@ -312,7 +318,6 @@ max_results = The max number of tweets to retrieve in a given call. Must be an i
                     print("token to insert:",next_token)
             #if the returned amount of tweets is getting close to the limit number, we need to alter the max_result,
             #so we won't get tweets beyond what we asked
-            
             if (limit_amount_of_returned_tweets - num_of_returned_tweets) < max_results:
                 max_results = limit_amount_of_returned_tweets - num_of_returned_tweets
                 if max_results < 10:
@@ -330,9 +335,9 @@ max_results = The max number of tweets to retrieve in a given call. Must be an i
                         'tweet.fields': 'id,text,author_id,in_reply_to_user_id,geo,conversation_id,created_at,lang,public_metrics,referenced_tweets,reply_settings,source',
                         'place.fields': 'full_name,id,country,country_code,geo,name,place_type',
                         'next_token': {next_token}}
-            
+
             json_response = self.__connect_to_endpoint(url = search_url,params= query_params, next_token = next_token)
-            
+
             json_response_list.append(json_response) #the first json_response itme
             num_of_returned_tweets += json_response["meta"]["result_count"]
 
@@ -340,15 +345,17 @@ max_results = The max number of tweets to retrieve in a given call. Must be an i
             try:
                 a = pd.json_normalize(json_response["data"])
                 b = pd.json_normalize(json_response["includes"], ["users"]).add_prefix("users.")
-                
+
                 a.conversation_id = a.conversation_id.astype("string")
                 a.id = a.id.astype("string")
                 a["id_new"] = "id: " + a["id"].astype("string")
                 a["conv_id_new"] = "conv_id: " + a["conversation_id"].astype("string")
+                a["author_id_new"] = "author_id" + a["author_id"].astype("string")
+
             #c = pd.json_normalize(json_response["includes"]["places"]).add_prefix("places.")
                 df_tweets_i = pd.merge(a, b, left_on="author_id", right_on="users.id")
-                list_of_cols_to_add = ['author_id', 'conversation_id', "conv_id_new", "id", "id_new",
-                                    'created_at','entities.mentions',
+                list_of_cols_to_add = ['author_id', "author_id_new", 'conversation_id', "conv_id_new",
+                                        "id", "id_new",'created_at','entities.mentions',
                             'public_metrics.like_count', 'public_metrics.quote_count',
                         'public_metrics.reply_count', 'public_metrics.retweet_count','referenced_tweets', 'text',
                             'users.created_at', 'users.description','users.id', 'users.name',
@@ -358,7 +365,7 @@ max_results = The max number of tweets to retrieve in a given call. Must be an i
 
                 list_cols_to_drop = [x for x in df_tweets_i.columns if x not in list_of_cols_to_add]
 
-                ##droping labels we don't need
+                ##droping labels (columns) we don't need
                 df_tweets_i = df_tweets_i.drop(labels=list_cols_to_drop, axis = 1, errors = "ignore")
 
                 for col in list_of_cols_to_add:
@@ -369,16 +376,23 @@ max_results = The max number of tweets to retrieve in a given call. Must be an i
                 col_list_df_tweets_i = df_tweets_i.columns.tolist()
                 col_list_df_tweets_i.sort()
                 df_tweets_i = df_tweets_i.reindex(columns=col_list_df_tweets_i)
-                
+            
+                #This will be the csv file name that will contain all the tweets of the specific user:
                 name = user_name + ".csv"
-                path_for_table = os.path.join(dir_name_beta, name)
+                path_for_table = os.path.join(dir_name, name)
                 if os.path.isfile(path_for_table) == False: #if this is the first table of tweets
                     df_tweets_i.to_csv(path_for_table, index=True)
                 else:
                     df_tweets_i.to_csv(path_for_table, mode='a', index=True, header=False)
             except:
                 print("no data / include in the json")
-        
+            
+            ### save all thr json responses in json file:
+            path_for_dir_all_json_responses = os.path.join(path_for_log_dir_of_certain_user, 'all_json_responses.json')
+            with open(path_for_dir_all_json_responses, 'w') as outfile:
+                json.dump(json_response_list, outfile)
+            
+            ### Writing in the retrieving tweets log file the number of retrieved tweets + status - is the function finished running or keep retrieving more tweets?
             with open(path_for_dir_retriving_tweets_streem, 'a') as f:
                 print_stat = str(counter_loops) + " -> Got from twitter " + str(json_response["meta"]["result_count"]) + " tweets, and there are more tweets of that user to get, I am bringing more tweets!"
                 f.write(print_stat+'\n')
@@ -401,97 +415,102 @@ max_results = The max number of tweets to retrieve in a given call. Must be an i
                 print("no more tweets from this user")
                 continue_searching = False
                 print("Total amount of collected tweets = ", num_of_returned_tweets)
-            
+
             if num_of_returned_tweets >=limit_amount_of_returned_tweets:
                 print("oooops, There may be more tweets to return, but you asked to limit the amount of returned tweets")
                 print("infact you got", num_of_returned_tweets, "returned tweets and limited the function to get", limit_amount_of_returned_tweets, "tweets")
-        
+
         #In what case we suspect that there may be more tweets that we didn't get? -->
         #When the number of tweets we asked to get is equal to the number of tweets we got back
-        
-        ### save all thr json responses in json file:
-        path_for_dir_all_json_responses = os.path.join(path_for_log_dir_of_certain_user, 'all_json_responses.json')
-        with open(path_for_dir_all_json_responses, 'w') as outfile:
-            json.dump(json_response_list, outfile)
+
         return json_response_list, num_of_returned_tweets, next_tokens
 
  #The following cose check wheter the user_name is a list, if not it turnes it into a list
-      
+
 
     def return_tweets_of_key_opinion_leaders(self, query="",dir_name="tweets", user_names =None, \
         start_time = "2015-12-7T00:00:00Z", end_time = "2021-12-26T00:00:00Z",
         max_results = 10, evaluate_last_token = False, \
             limit_amount_of_returned_tweets = 10000000, verbose_10 = False):
         """ ## Return Tweets of Key Opinion leaders
-                
-        This function enalbes getting all the tweets written by a list of twitter accounts in a certain time-frame.\n
+
+This function enalbes getting all the tweets written by a list of twitter accounts in a certain time-frame.\n
+
++ link to twitter-developer page regarding this capability:
+https://developer.twitter.com/en/docs/twitter-api/tweets/search/api-reference/get-tweets-search-all
+
+### App rate limit:
+        - App rate limit (OAuth 2.0 App Access Token): 300 requests per 15-minute window shared among all users of your app
+        - App rate limit (OAuth 2.0 App Access Token): 1 request per second shared among all users of your app
         
-        + link to twitter-developer page regarding this capability:\n
-        https://developer.twitter.com/en/docs/twitter-api/tweets/search/api-reference/get-tweets-search-recent
+Parameters
+- query : str --> You can see the full documentation on how to build a query (what to pass in the `query` argument) in the following link:\n
+https://developer.twitter.com/en/docs/twitter-api/tweets/counts/integrate/build-a-query
+        
+- dir_name: by defualy "tweets" --> the dir name to put all the data from the function
 
+- start_date = The start date is the date that from it the function will look and rerieve tweets.\n
+Note that the format of the start time should be: "2015-12-7T00:00:00Z" (this is the default)
 
-        ### App rate limit: 
-        - App rate limit (OAuth 2.0 App Access Token): 450 requests per 15-minute window shared among all users of your app
-        - User rate limit (OAuth 2.0 user Access Token): 180 requests per 15-minute window per each authenticated user
+- end_date = The end date is the date that till it the function will look and rerieve tweets.\n
+Note that the format of the end time should be: "2021-12-26T00:00:00Z" (this is the default)
 
-        Parameters
-        ----------
-        query : str --> You can see the full documentation on how to build a query (what to pass in the `query` argument) in the following link:\n
-        https://developer.twitter.com/en/docs/twitter-api/tweets/counts/integrate/build-a-query
+- max_results = The max number of tweets to retrieve in a given call. Must be an integer between 10 to 500.
+- evaluate_last_token - by default = False--> If you have already retrive data on the given tweeter acconts and you wish to continue retriving from the place you stopped, pass "True" to this arguemnt.
 
-        start_date = The start date is the date that from it the function will look and rerieve tweets.\nNote that the format of the start time should be: "2015-12-7T00:00:00Z"
-        end_date = The end date is the date that till it the function will look and rerieve tweets.\nNote that the format of the end time should be: "2021-12-7T00:00:00Z"
+- limit_amount_of_returned_tweets - by default = 10000000 --> Lets say a given account had 5000 tweets in the given timeframe (from the given start to the given end date), and you wish to get only the first 2000, then pass to this arguemnt 2000. It will automatically stop the function when it reaches the `limit_amount_of_returned_tweets` you provided
 
-        max_results = The max number of tweets to retrieve in a given call. Must be an integer between 10 to 100.
-
+- verbose_10 - by default = False --> If True then the function will print certain things throught the run of the function.    
         """
 
+        #handling case where the user entered a max_result that is not between 10 and 100
+        if max_results > 500:
+            max_results = 500
+            print('max_results can not be greater than 500, changed to 500')
+        if max_results < 10:
+            max_results = 10
+            print('max_results can not be smaller than 10, changed to 10')
+
+        if type(user_names) != list:
+            user_names = [user_names]
+
+        #users_json_response_lists = []
+        names_evaluated = []
+        names_didnt_evaluated = []
+        next_tokens_users= [] #this will include a list where eachelement is a list containing all the tokens off the specific user
+        for name in user_names:
+            print("Bringing tweets of", name)
+            query = ""
+            user_name = name
+            try:
+
+                json_response_list, num_of_returned_tweets,next_tokens = self.__return_tweets_of_key_opinion_leader(query=query, user_name=user_name,
+                                                        start_time = start_time, evaluate_last_token = evaluate_last_token,
+                                                        end_time = end_time,
+                                                        max_results = max_results, dir_name=dir_name,
+                                                        limit_amount_of_returned_tweets = limit_amount_of_returned_tweets,
+                                                                                                            verbose_10 = verbose_10)
+                print(num_of_returned_tweets)
+                if num_of_returned_tweets > 0:
+                    names_evaluated.append(name)
+                    next_tokens_users.append(next_tokens)
 
 
-
-
-
-            if type(user_names) != list:
-                user_names = [user_names]
-            
-            #users_json_response_lists = []
-            names_evaluated = []
-            names_didnt_evaluated = []
-            next_tokens_users= [] #this will include a list where eachelement is a list containing all the tokens off the specific user
-            for name in user_names:
-                print("Bringing tweets of", name)
-                query = ""
-                user_name = name
-                try:
-
-                    json_response_list, num_of_returned_tweets,next_tokens = self.__return_tweets_of_key_opinion_leader(query=query, user_name=user_name,
-                                                            start_time = start_time, evaluate_last_token = evaluate_last_token,
-                                                            end_time = end_time,
-                                                            max_results = max_results, dir_name=dir_name,
-                                                            limit_amount_of_returned_tweets = limit_amount_of_returned_tweets,
-                                                                                                                verbose_10 = verbose_10)
-                    print(num_of_returned_tweets)
-                    if num_of_returned_tweets > 0:
-                        names_evaluated.append(name)
-                        next_tokens_users.append(next_tokens)
-                
-
-                    else:
-                        names_didnt_evaluated.append(name)
-                        print("The user:", name, "had", num_of_returned_tweets, "tweets!!")
-
-                    print("---------------------------------------------------------------")
-                except:
-                    print("There was a problem with the key opinion leader:", name)
+                else:
                     names_didnt_evaluated.append(name)
-                    print("*************************************************************************************")
+                    print("The user:", name, "had", num_of_returned_tweets, "tweets!!")
 
-    import time, datetime,json, numpy as np
-    from inputimeout import inputimeout, TimeoutOccurred
+                print("---------------------------------------------------------------")
+            except:
+                print("There was a problem with the key opinion leader:", name)
+                names_didnt_evaluated.append(name)
+                print("*************************************************************************************")
 
 
+
+############################################ roy: Dont know what is this ######################################################################
     def create_url_tweet_ids(self, search_url, tweet_ids_list, verbose = False):
-    
+
         #search_url = "https://api.twitter.com/2/tweets/search/recent" #Change to the endpoint you want to collect data from
         search_url = search_url.replace("X", ','.join(tweet_ids_list))
         if verbose: print(search_url)
@@ -505,20 +524,14 @@ max_results = The max number of tweets to retrieve in a given call. Must be an i
         return (search_url, query_params)
 
 
-
-    #   sleep_time = 15*60 ## 15 minutes in sec
-    #   tweet_ids = all_harvard_data["ID"].to_numpy().astype(str)
-
-    from os import path
-
-
-    def get_tweets_by_tweet_ids(self , tweet_ids, #TypeError: 'type' object is not subscriptable 
+##################################################roy: dont know what this is: ################################################################
+    def get_tweets_by_tweet_ids(self , tweet_ids, #TypeError: 'type' object is not subscriptable
      json_tweets_output_folder : str,
      tweets_per_api_request : int = 100,
      api_error_sleep_secs : int = 15*60,
      verbose = False ):
 
-        os.makedirs(json_tweets_output_folder, exist_ok = True) 
+        os.makedirs(json_tweets_output_folder, exist_ok = True)
 
         count_proccesed_tweets_file = os.path.join(json_tweets_output_folder, 'count_proccesed_tweets.txt')
         count_requests_sent_file = os.path.join(json_tweets_output_folder,'count_requests_sent.txt')
@@ -527,24 +540,24 @@ max_results = The max number of tweets to retrieve in a given call. Must be an i
         if not os.path.exists(count_requests_sent_file):
             with open(count_requests_sent_file,'w') as f:
                 f.write('%d' % 0)
-        
+
         if not os.path.exists(count_proccesed_tweets_file):
             with open(count_proccesed_tweets_file,'w') as f:
                 f.write('%d' % 0)
-        
-        count_proccesed_tweets = int( open(count_proccesed_tweets_file,'r').read())   
+
+        count_proccesed_tweets = int( open(count_proccesed_tweets_file,'r').read())
 
         count_requests_sent = int( open(count_requests_sent_file,'r').read())
 
         while(count_proccesed_tweets < len(tweet_ids)):
-            
-            if verbose: 
+
+            if verbose:
                 print(f'~~~~~ Already sent {count_requests_sent} requests')
                 print(f'~~~~~ Already proccesed {count_proccesed_tweets} tweets')
                 print(f'~~~~~ Currently proccessing {tweets_per_api_request} tweets')
 
-            
-            ## FIXME - last batch size cant be more than what's left 
+
+            ## FIXME - last batch size cant be more than what's left
 
             tweet_ids_batch = tweet_ids[count_proccesed_tweets:(count_proccesed_tweets+ tweets_per_api_request )// (len(tweet_ids)-1)]
             search_url, query_params = self.create_url_tweet_ids("https://api.twitter.com/2/tweets/?ids=X" , tweet_ids_batch)
@@ -552,29 +565,29 @@ max_results = The max number of tweets to retrieve in a given call. Must be an i
 
             try:
                 json_response = self.__connect_to_endpoint( url = search_url, params= query_params)
-            except Exception as e: 
+            except Exception as e:
                 print(f'Twitter API error: {e} \n Sleeping 15 min from {datetime.datetime.now()}')
                 time.sleep(api_error_sleep_secs)
 
-                    
+
             count_proccesed_tweets += tweets_per_api_request
             count_requests_sent += 1
 
-            
+
             with open(f'{json_output_file_basename}{count_requests_sent}.json', "w") as twitter_data_file:
-                json.dump(json_response, twitter_data_file, indent=4, sort_keys=True) 
-                
+                json.dump(json_response, twitter_data_file, indent=4, sort_keys=True)
+
             with open(count_proccesed_tweets_file, "w") as f:
                 f.write('%d' % count_proccesed_tweets)
-            
+
             with open(count_requests_sent_file, "w") as f:
-                f.write('%d' % count_requests_sent) 
-            
+                f.write('%d' % count_requests_sent)
+
             # if verbose: print(f'~~~~~ Batch done, moving forward (sleep 2 min for debug)')
-            # time.sleep(5)  
+            # time.sleep(5)
 
 
-
+########################## Function to get all the retweets given a tweet id / conversation id #############################################################
     def __return_retweets_of_tweet_id_SMALL(self, tweet_id=None,
                                         max_results = 10, evaluate_last_token = False,
                                         limit_amount_of_returned_retweets = 10000000,
@@ -584,40 +597,32 @@ max_results = The max number of tweets to retrieve in a given call. Must be an i
         search_url = search_url.replace(":id", tweet_id)
 
         import os.path
-        #making a dir for the tree - this file will cintain a unique file for each conversation id
+        #making a dir for the tree - this file will contain a unique file for each conversation id
         #dir_tree_name = "conversation_trees"
         try:
             os.mkdir(dir_tree_name)
             print("creating tree directory", dir_tree_name, "to store all the trees")
         except:
             print("The dir", dir_tree_name ,"already exist")
-        
-        
-        #making dir (inside the tree dir) to store, for each tweet-id all its retweets
+
+        # Making directory (inside the tree dir) to store, for each tweet-id all its retweets (in one csv file)
         name_for_tweet_id = "conv_tree_for_" + str(tweet_id)
-        dir_name_for_tweet_id = os.path.join(dir_tree_name, name_for_tweet_id) 
+        dir_name_for_tweet_id = os.path.join(dir_tree_name, name_for_tweet_id)
         try:
             os.mkdir(dir_name_for_tweet_id)
             print("creating directory", dir_name_for_tweet_id, "to insert all the retweets of the given tweet-id")
         except:
             print("The dir", dir_name_for_tweet_id ,"already exist")
 
-        ##### the log dir
-        dir_log_name = os.path.join(dir_name_for_tweet_id, "log_retweets_for_tweet_id_" + tweet_id) 
+        ##### Creating The log directory (that will contain 3 files: The token file, the retriving tweets streem and the full json file)
+        dir_log_name = os.path.join(dir_name_for_tweet_id, "log_retweets_for_tweet_id_" + tweet_id)
         try:
             os.mkdir(dir_log_name)
             print("creating directory", dir_log_name, "to insert all the logs of the retweets for the tweet id - ", str(tweet_id))
         except:
             print("The dir", dir_log_name ,"already exist")
-            
-        ########################
-    #     path_for_log_dir_of_certain_user = os.path.join(dir_log_name, user_name)
-    #     try:
-    #         os.mkdir(path_for_log_dir_of_certain_user)
-    #         print("creating directory", path_for_log_dir_of_certain_user,"in the dir",dir_log_name, "to insert all the logs of the key opinion leader", user_name)
-    #     except:
-    #         print("The dir", path_for_log_dir_of_certain_user ,"already exist")
 
+        ######################## creating a path for the specific tweet-id that we wish to retirve its retweets
         path_for_dir_retriving_retweets_stream = os.path.join(dir_log_name, 'retriving_retweets_streem.txt')
 
         with open(path_for_dir_retriving_retweets_stream, 'a') as f:
@@ -627,8 +632,8 @@ max_results = The max number of tweets to retrieve in a given call. Must be an i
             current_time = "Current Time: " + current_time + "   *****************************************   "
             f.write(current_time + '\n\n')
 
-        ########### If the token file exist already, then take the last token available, else start from token 1  ############ 
-        tokens_location = os.path.join(dir_log_name, "tokens.txt") 
+        ########### If the token file exist already, then take the last token available, else start from token 1  ############
+        tokens_location = os.path.join(dir_log_name, "tokens.txt")
 
         if (evaluate_last_token == True and os.path.isfile(tokens_location) == True):
             a_file = open(tokens_location, "r")
@@ -658,11 +663,12 @@ max_results = The max number of tweets to retrieve in a given call. Must be an i
 
         ##########################################################################################
 
-        continue_searching = True
-        json_response_list = []
-        next_tokens = []
-        num_of_returned_retweets = 0
-        counter_loops = 0
+        continue_searching = True #logical variable that controls the for loop, as long as it is True, the function will keep trying to retrive tweets
+        json_response_list = [] #list containing all the json responses the function got. In each loop we are
+        #saving that list in the log-json file (so if there was a problem in a certain loop, we would have all the jsons till that problematic loop)
+        next_tokens = [] #list containing all the tokens
+        num_of_returned_retweets = 0 # counter of returned retweets
+        counter_loops = 0 #counter of the loops - the number of calls to twitter API
 
         while continue_searching == True and num_of_returned_retweets < limit_amount_of_returned_retweets:
             counter_loops +=1
@@ -673,9 +679,7 @@ max_results = The max number of tweets to retrieve in a given call. Must be an i
             #if the returned amount of retweets is getting close to the limit number, we need to alter the max_result,
             #so we won't get retweets beyond what we asked
             #if (limit_amount_of_returned_retweets - num_of_returned_retweets) < max_results:
-            max_results = min(limit_amount_of_returned_retweets - num_of_returned_retweets,max_results)
-            #else :
-            #    max_results = max_results
+            max_results = min(limit_amount_of_returned_retweets - num_of_returned_retweets, max_results)
 
         #change params based on the endpoint you are using
             query_params = {
@@ -686,7 +690,6 @@ max_results = The max number of tweets to retrieve in a given call. Must be an i
                             'max_results': max_results,
                             'pagination_token': next_token}
 
-            
             json_response = self.__connect_to_endpoint(url = search_url, params= query_params, next_token = next_token, is_retweet = True)
 
             # #check if the tweeet_id is valid = if we can find its retweets:
@@ -765,50 +768,75 @@ max_results = The max number of tweets to retrieve in a given call. Must be an i
 
         return json_response_list, num_of_returned_retweets, next_tokens
 
-
     def return_retweets_by_tweet_ids(self, tweet_ids,max_results = 10, evaluate_last_token = False,
                                         limit_amount_of_returned_retweets = 10000000,
                                     verbose = False, dir_tree_name = "conversation_trees"):
-                if max_results > 100:
-                    max_results = 100
-                    print('max_results can not be greater than 100, changed to 100')
-                    
-                if type(tweet_ids) != list:
-                    tweet_ids = [tweet_ids]
-                
-                #users_json_response_lists = []
-                tweet_ids_evaluated = []
-                tweet_ids_didnt_evaluated = []
-                next_tokens_users= [] #this will include a list where eachelement is a list containing all the tokens off the specific user
-                for tweet_id in tweet_ids:
-                    print("Bringing retweets of", tweet_id)
-                    try:
-                        json_response_list, num_of_returned_retweets,next_tokens =\
-                             self.__return_retweets_of_tweet_id_SMALL(tweet_id=tweet_id,
-                                    max_results = max_results, evaluate_last_token = evaluate_last_token,
-                                    limit_amount_of_returned_retweets = limit_amount_of_returned_retweets,
-                                   verbose = verbose, dir_tree_name = dir_tree_name)
-                        
-                        
-                        print(num_of_returned_retweets)
-                        if num_of_returned_retweets > 0:
-                            tweet_ids_evaluated.append(tweet_id)
-                            next_tokens_users.append(next_tokens)
-                    
+        """ ## Return Retweets of a given list of tweetIds / converstionIds 
 
-                        else:
-                            tweet_ids_didnt_evaluated.append(tweet_id)
-                            print("The tweet_id:", tweet_id, "had", num_of_returned_retweets, "tweets!!")
+This function enalbes getting all the retweets of a list of tweetids - return information on the people who retweeted a tweet.\n
 
-                        print("---------------------------------------------------------------")
-                    except:
-                        print("There was a problem with the tweet id:", tweet_id)
-                        tweet_ids_didnt_evaluated.append(tweet_id)
-                        print("*************************************************************************************")
++ link to twitter-developer page regarding this capability:
+https://developer.twitter.com/en/docs/twitter-api/tweets/retweets/api-reference/get-tweets-id-retweeted_by
+
+### App rate limit:
+        - App rate limit (OAuth 2.0 App Access Token): 75 requests per 15-minute window shared among all users of your app
+        - User rate limit (OAuth 2.0 user Access Token): 75 requests per 15-minute window per each authenticated user
+
+### Parameters
+- tweet_ids: list --> a list with all the tweet-ids you wish to get all of their retweets
+
+- max_results = The max number of retweets to retrieve in a given call. Must be an integer between 1 to 100.
+
+- evaluate_last_token - by default = False--> If you have already retrive retweets on the given tweet-id and you wish to continue retriving from the place you stopped, pass "True" to this arguemnt.
+
+- limit_amount_of_returned_retweets - by default = 10000000 --> Lets say a given tweet had 5000 retweets,
+and you wish to get only the first 2000 retweets, then pass to this arguemnt 2000.
+It will automatically stop the function when it reaches the `limit_amount_of_returned_retweets` you provided
+
+- verbose_10 - by default = False --> If True then the function will print certain things throught the run of the function.    
+
+- dir_tree_name: by default "conversation_trees" --> the dir name to put all the data from the function
+        """                
+        
+        if max_results > 100:
+            max_results = 100
+            print('max_results can not be greater than 100, changed to 100')
+
+        if type(tweet_ids) != list:
+            tweet_ids = [tweet_ids]
+
+        #users_json_response_lists = []
+        tweet_ids_evaluated = []
+        tweet_ids_didnt_evaluated = []
+        next_tokens_users= [] #this will include a list where eachelement is a list containing all the tokens off the specific user
+        for tweet_id in tweet_ids:
+            print("Bringing retweets of", tweet_id)
+            try:
+                json_response_list, num_of_returned_retweets,next_tokens =\
+                        self.__return_retweets_of_tweet_id_SMALL(tweet_id=tweet_id,
+                            max_results = max_results, evaluate_last_token = evaluate_last_token,
+                            limit_amount_of_returned_retweets = limit_amount_of_returned_retweets,
+                            verbose = verbose, dir_tree_name = dir_tree_name)
 
 
-#### quotes
+                print(num_of_returned_retweets)
+                if num_of_returned_retweets > 0:
+                    tweet_ids_evaluated.append(tweet_id)
+                    next_tokens_users.append(next_tokens)
 
+
+                else:
+                    tweet_ids_didnt_evaluated.append(tweet_id)
+                    print("The tweet_id:", tweet_id, "had", num_of_returned_retweets, "tweets!!")
+
+                print("---------------------------------------------------------------")
+            except:
+                print("There was a problem with the tweet id:", tweet_id)
+                tweet_ids_didnt_evaluated.append(tweet_id)
+                print("*************************************************************************************")
+
+
+################################################## quotes ###############################################
 
     def __return_quotes_of_tweet_id_SMALL(self, tweet_id=None,
                                         max_results = 10, evaluate_last_token = False,
@@ -819,18 +847,17 @@ max_results = The max number of tweets to retrieve in a given call. Must be an i
         search_url = search_url.replace(":id", tweet_id)
 
         import os.path
-        #making a dir for the tree - this file will cintain a unique file for each conversation id
+        #making a dir for the tree - this file will contain a unique file for each conversation id
         #dir_tree_name = "conversation_trees"
         try:
             os.mkdir(dir_tree_name)
             print("creating tree directory", dir_tree_name, "to store all the trees")
         except:
             print("The dir", dir_tree_name ,"already exist")
-        
-        
+
         #making dir (inside the tree dir) to store, for each tweet-id all its quotes
         name_for_tweet_id = "conv_tree_for_" + str(tweet_id)
-        dir_name_for_tweet_id = os.path.join(dir_tree_name, name_for_tweet_id) 
+        dir_name_for_tweet_id = os.path.join(dir_tree_name, name_for_tweet_id)
         try:
             os.mkdir(dir_name_for_tweet_id)
             print("creating directory", dir_name_for_tweet_id, "to insert all the quotes of the given tweet-id")
@@ -838,21 +865,14 @@ max_results = The max number of tweets to retrieve in a given call. Must be an i
             print("The dir", dir_name_for_tweet_id ,"already exist")
 
         ##### the log dir
-        dir_log_name = os.path.join(dir_name_for_tweet_id, "log_quotes_for_tweet_id_" + tweet_id) 
+        dir_log_name = os.path.join(dir_name_for_tweet_id, "log_quotes_for_tweet_id_" + tweet_id)
         try:
             os.mkdir(dir_log_name)
             print("creating directory", dir_log_name, "to insert all the logs of the quotes for the tweet id - ", str(tweet_id))
         except:
             print("The dir", dir_log_name ,"already exist")
-            
-        ########################
-    #     path_for_log_dir_of_certain_user = os.path.join(dir_log_name, user_name)
-    #     try:
-    #         os.mkdir(path_for_log_dir_of_certain_user)
-    #         print("creating directory", path_for_log_dir_of_certain_user,"in the dir",dir_log_name, "to insert all the logs of the key opinion leader", user_name)
-    #     except:
-    #         print("The dir", path_for_log_dir_of_certain_user ,"already exist")
 
+        ########################
         path_for_dir_retriving_quotes_stream = os.path.join(dir_log_name, 'retriving_quotes_streem.txt')
         with open(path_for_dir_retriving_quotes_stream, 'a') as f:
             from datetime import datetime
@@ -861,8 +881,8 @@ max_results = The max number of tweets to retrieve in a given call. Must be an i
             current_time = "Current Time: " + current_time + "   *****************************************   "
             f.write(current_time + '\n\n')
 
-        ########### If the token file exist already, then take the last token available, else start from token 1  ############ 
-        tokens_location = os.path.join(dir_log_name, "tokens.txt") 
+        ########### If the token file exist already, then take the last token available, else start from token 1  ############
+        tokens_location = os.path.join(dir_log_name, "tokens.txt")
 
         if (evaluate_last_token == True and os.path.isfile(tokens_location) == True):
             a_file = open(tokens_location, "r")
@@ -919,7 +939,7 @@ max_results = The max number of tweets to retrieve in a given call. Must be an i
                             'user.fields': 'id,name,username,created_at,description,public_metrics,verified',
                             'max_results': max_results,
                             'pagination_token': {next_token}}
-            
+
             json_response = self.__connect_to_endpoint(url = search_url, params= query_params, next_token = next_token, is_retweet = True)
 
             json_response_list.append(json_response) #the first json_response itme
@@ -929,11 +949,14 @@ max_results = The max number of tweets to retrieve in a given call. Must be an i
             try:
                 a = pd.json_normalize(json_response["data"])
                 a["id_new"] = "id: " + a["id"].astype("string")
+                a["conversation_id_new"] = "conversation_id: " + a["conversation_id"].astype("string")
+                a["author_id_new"] = "author_id: " + a["author_id"].astype("string")
                 b = pd.json_normalize(json_response["includes"], ["users"]).add_prefix("users.")
 
                 df_tweets_i = pd.merge(a, b, left_on="author_id", right_on="users.id")
 
-                list_of_cols_to_add = ['id', "id_new", 'conversation_id', 'lang', 'author_id', 'referenced_tweets',
+                list_of_cols_to_add = ['id', "id_new", 'conversation_id', "conversation_id_new",
+                                        'lang', 'author_id', "author_id_new" ,'referenced_tweets',
                                     'text', 'created_at', 'source', 'reply_settings',
                                     'public_metrics.retweet_count', 'public_metrics.reply_count',
                                     'public_metrics.like_count', 'public_metrics.quote_count',
@@ -943,7 +966,7 @@ max_results = The max number of tweets to retrieve in a given call. Must be an i
                                     'users.public_metrics.following_count',
                                     'users.public_metrics.tweet_count',
                                     'users.public_metrics.listed_count'] #'referenced_tweet_type', 'referenced_tweet_id'
-                
+
                 list_cols_to_drop = [x for x in a.columns if x not in list_of_cols_to_add]
 
                 ##droping labels we don't need
@@ -953,15 +976,13 @@ max_results = The max number of tweets to retrieve in a given call. Must be an i
                     if col not in df_tweets_i.columns:
                         df_tweets_i[col] = "NA"
 
-
-                
                 # #add 2 new columns for referenced tweets
                 # referenced_tweet_type = []
                 # referenced_tweet_id = []
                 # for row in range(df_tweets_i.shape[0]):
                 #     referenced_tweet_type.append(df_tweets_i.referenced_tweets[0][0]["type"])
                 #     referenced_tweet_id.append(df_tweets_i.referenced_tweets[0][0]["id"])
-                            
+
                 # df_tweets_i["referenced_tweets_type"] = np.asarray(referenced_tweet_type)
                 # df_tweets_i["referenced_tweets_id"] = np.asarray(referenced_tweet_id)
                 #sort columns by alphabetic order
@@ -1019,54 +1040,82 @@ max_results = The max number of tweets to retrieve in a given call. Must be an i
         return json_response_list, num_of_returned_quotes, next_tokens,path_for_table
 
 
-    def return_quotes_by_tweet_ids(self, tweet_ids,max_results = 10, evaluate_last_token = False,
+    def return_quotes_by_tweet_ids(self, tweet_ids, max_results = 10, evaluate_last_token = False,
                                             limit_amount_of_returned_quotes = 10000000,
                                         verbose = False, dir_tree_name = "conversation_trees"):
-                    if max_results > 100:
-                        max_results = 100
-                        print('max_results can not be greater than 100, changed to 100')
-                    if max_results < 10:
-                        max_results = 10
-                        print('max_results can not be smaller than 10, changed to 10')
-                    if type(tweet_ids) != list:
-                        tweet_ids = [tweet_ids]
-                    
-                    #users_json_response_lists = []
-                    tweet_ids_evaluated = []
-                    tweet_ids_didnt_evaluated = []
-                    next_tokens_users= [] #this will include a list where eachelement is a list containing all the tokens off the specific user
-                    path_for_table_dict = {}
-                    for tweet_id in tweet_ids:
-                        print("Bringing quotes of", tweet_id)
-                        try:
-                            json_response_list, num_of_returned_quotes,next_tokens, path_for_table =\
-                                self.__return_quotes_of_tweet_id_SMALL(tweet_id=tweet_id,
-                                        max_results = max_results, evaluate_last_token = evaluate_last_token,
-                                        limit_amount_of_returned_quotes = limit_amount_of_returned_quotes,
-                                    verbose = verbose, dir_tree_name = dir_tree_name)
-                            
-                            path_for_table_dict[tweet_id] = path_for_table
 
-                            
-                            print(num_of_returned_quotes)
-                            if num_of_returned_quotes > 0:
-                                tweet_ids_evaluated.append(tweet_id)
-                                next_tokens_users.append(next_tokens)
-                        
+        """ ## Return Quotes of a given list of tweet Ids / converstion Ids 
 
-                            else:
-                                tweet_ids_didnt_evaluated.append(tweet_id)
-                                print("The tweet_id:", tweet_id, "had", num_of_returned_quotes, "quotes!!")
+This function enalbes getting all the quotes of a list of tweetids / conversation ids.\n
 
-                            print("---------------------------------------------------------------")
-                        except:
-                            print("There was a problem with the tweet id:", tweet_id)
-                            tweet_ids_didnt_evaluated.append(tweet_id)
-                            print("*************************************************************************************")
++ link to twitter-developer page regarding this capability:
+https://developer.twitter.com/en/docs/twitter-api/tweets/quote-tweets/api-reference/get-tweets-id-quote_tweets
 
-                    return path_for_table_dict
+### App rate limit:
+        - App rate limit (OAuth 2.0 App Access Token): 75 requests per 15-minute window shared among all users of your app
+        - User rate limit (OAuth 2.0 user Access Token): 75 requests per 15-minute window per each authenticated user
 
-# likes
+### Parameters
+- tweet_ids: list --> a list with all the tweet-ids you wish to get all of their quotes
+
+- max_results = The max number of retweets to retrieve in a given call. Must be an integer between 10 to 100.
+
+- evaluate_last_token - by default = False--> If you have already retrive quotes on the given tweet-id and you wish to continue retriving from the place you stopped, pass "True" to this arguemnt.
+
+- limit_amount_of_returned_quotes - by default = 10000000 --> Lets say a given tweet had 5000 quotes,
+and you wish to get only the first 2000 quotes, then pass to this arguemnt 2000.
+It will automatically stop the function when it reaches the `limit_amount_of_returned_quotes` you provided
+
+- verbose_10 - by default = False --> If True then the function will print certain things throught the run of the function.    
+
+- dir_tree_name: by default "conversation_trees" --> the dir name to put all the data from the function
+        """   
+
+        if max_results > 100:
+            max_results = 100
+            print('max_results can not be greater than 100, changed to 100')
+        if max_results < 10:
+            max_results = 10
+            print('max_results can not be smaller than 10, changed to 10')
+        if type(tweet_ids) != list:
+            tweet_ids = [tweet_ids]
+
+        #users_json_response_lists = []
+        tweet_ids_evaluated = []
+        tweet_ids_didnt_evaluated = []
+        next_tokens_users= [] #this will include a list where eachelement is a list containing all the tokens off the specific user
+        path_for_table_dict = {}
+        for tweet_id in tweet_ids:
+            print("Bringing quotes of", tweet_id)
+            try:
+                json_response_list, num_of_returned_quotes,next_tokens, path_for_table =\
+                    self.__return_quotes_of_tweet_id_SMALL(tweet_id=tweet_id,
+                            max_results = max_results, evaluate_last_token = evaluate_last_token,
+                            limit_amount_of_returned_quotes = limit_amount_of_returned_quotes,
+                        verbose = verbose, dir_tree_name = dir_tree_name)
+
+                path_for_table_dict[tweet_id] = path_for_table
+
+
+                print(num_of_returned_quotes)
+                if num_of_returned_quotes > 0:
+                    tweet_ids_evaluated.append(tweet_id)
+                    next_tokens_users.append(next_tokens)
+
+
+                else:
+                    tweet_ids_didnt_evaluated.append(tweet_id)
+                    print("The tweet_id:", tweet_id, "had", num_of_returned_quotes, "quotes!!")
+
+                print("---------------------------------------------------------------")
+            except:
+                print("There was a problem with the tweet id:", tweet_id)
+                tweet_ids_didnt_evaluated.append(tweet_id)
+                print("*************************************************************************************")
+
+        return path_for_table_dict
+
+################################################ likes ##################################################
     def __return_likes_of_tweet_id_SMALL(self, tweet_id=None,
                                         max_results = 10, evaluate_last_token = False,
                                             limit_amount_of_returned_likes = 10000000,
@@ -1076,18 +1125,17 @@ max_results = The max number of tweets to retrieve in a given call. Must be an i
         search_url = search_url.replace(":id", tweet_id)
 
         import os.path
-        #making a dir for the tree - this file will cintain a unique file for each conversation id
+        #making a dir for the tree - this file will contain a unique file for each conversation id
         #dir_tree_name = "conversation_trees"
         try:
             os.mkdir(dir_tree_name)
             print("creating tree directory", dir_tree_name, "to store all the trees")
         except:
             print("The dir", dir_tree_name ,"already exist")
-        
-        
-        #making dir (inside the tree dir) to store, for each tweet-id all its quotes
+
+        #making dir (inside the tree dir) to store, for each tweet-id all its likes
         name_for_tweet_id = "conv_tree_for_" + str(tweet_id)
-        dir_name_for_tweet_id = os.path.join(dir_tree_name, name_for_tweet_id) 
+        dir_name_for_tweet_id = os.path.join(dir_tree_name, name_for_tweet_id)
         try:
             os.mkdir(dir_name_for_tweet_id)
             print("creating directory", dir_name_for_tweet_id, "to insert all the likes of the given tweet-id")
@@ -1095,21 +1143,14 @@ max_results = The max number of tweets to retrieve in a given call. Must be an i
             print("The dir", dir_name_for_tweet_id ,"already exist")
 
         ##### the log dir
-        dir_log_name = os.path.join(dir_name_for_tweet_id, "log_likes_for_tweet_id_" + tweet_id) 
+        dir_log_name = os.path.join(dir_name_for_tweet_id, "log_likes_for_tweet_id_" + tweet_id)
         try:
             os.mkdir(dir_log_name)
             print("creating directory", dir_log_name, "to insert all the logs of the likes for the tweet id - ", str(tweet_id))
         except:
             print("The dir", dir_log_name ,"already exist")
-            
-        ########################
-    #     path_for_log_dir_of_certain_user = os.path.join(dir_log_name, user_name)
-    #     try:
-    #         os.mkdir(path_for_log_dir_of_certain_user)
-    #         print("creating directory", path_for_log_dir_of_certain_user,"in the dir",dir_log_name, "to insert all the logs of the key opinion leader", user_name)
-    #     except:
-    #         print("The dir", path_for_log_dir_of_certain_user ,"already exist")
 
+        ########################
         path_for_dir_retriving_likes_stream = os.path.join(dir_log_name, 'retriving_likes_streem.txt')
         with open(path_for_dir_retriving_likes_stream, 'a') as f:
             from datetime import datetime
@@ -1118,8 +1159,8 @@ max_results = The max number of tweets to retrieve in a given call. Must be an i
             current_time = "Current Time: " + current_time + "   *****************************************   "
             f.write(current_time + '\n\n')
 
-        ########### If the token file exist already, then take the last token available, else start from token 1  ############ 
-        tokens_location = os.path.join(dir_log_name, "tokens.txt") 
+        ########### If the token file exist already, then take the last token available, else start from token 1  ############
+        tokens_location = os.path.join(dir_log_name, "tokens.txt")
 
         if (evaluate_last_token == True and os.path.isfile(tokens_location) == True):
             a_file = open(tokens_location, "r")
@@ -1147,8 +1188,7 @@ max_results = The max number of tweets to retrieve in a given call. Must be an i
             current_time = now.strftime("%H:%M:%S (Date: %d.%m.%y)")
             current_time = "Current Time: " + current_time + "   *****************************************   "
             f.write(current_time+ '\n\n')
-
-        ##########################################################################################
+        ######################################## The Main For Loop #############################################
 
         continue_searching = True
         json_response_list = []
@@ -1175,7 +1215,7 @@ max_results = The max number of tweets to retrieve in a given call. Must be an i
                             'user.fields': 'id,name,username,created_at,description,public_metrics,verified',
                             'max_results': max_results,
                             'pagination_token': {next_token}}
-            
+
             json_response = self.__connect_to_endpoint(url = search_url, params= query_params, next_token = next_token, is_retweet = True)
 
             json_response_list.append(json_response) #the first json_response itme
@@ -1192,7 +1232,7 @@ max_results = The max number of tweets to retrieve in a given call. Must be an i
                 list_of_cols_to_add = ['id', "id_new", 'verified', 'created_at', 'description', 'name', 'username',
        'public_metrics.followers_count', 'public_metrics.following_count',
        'public_metrics.tweet_count', 'public_metrics.listed_count'] #'referenced_tweet_type', 'referenced_tweet_id'
-                
+
                 list_cols_to_drop = [x for x in a.columns if x not in list_of_cols_to_add]
 
                 ##droping labels we don't need
@@ -1201,7 +1241,7 @@ max_results = The max number of tweets to retrieve in a given call. Must be an i
                 for col in list_of_cols_to_add:
                     if col not in df_tweets_i.columns:
                         df_tweets_i[col] = "NA"
-                        
+
                 col_list_df_tweets_i = df_tweets_i.columns.tolist()
                 col_list_df_tweets_i.sort()
                 df_tweets_i = df_tweets_i.reindex(columns=col_list_df_tweets_i)
@@ -1219,7 +1259,6 @@ max_results = The max number of tweets to retrieve in a given call. Must be an i
                 path_for_dir_all_json_responses = os.path.join(dir_log_name, 'all_json_responses.json')
                 with open(path_for_dir_all_json_responses, 'w') as outfile:
                     json.dump(json_response_list, outfile)
-
 
             with open(path_for_dir_retriving_likes_stream, 'a') as f:
                 print_stat = str(counter_loops) + " -> Got from twitter " + str(json_response["meta"]["result_count"]) + " tweets, and there are more tweets of that user to get, I am bringing more tweets!"
@@ -1254,58 +1293,82 @@ max_results = The max number of tweets to retrieve in a given call. Must be an i
     def return_likes_by_tweet_ids(self, tweet_ids,max_results = 10, evaluate_last_token = False,
                                             limit_amount_of_returned_likes = 10000000,
                                         verbose = False, dir_tree_name = "conversation_trees"):
-                    if max_results > 100:
-                        max_results = 100
-                        print('max_results can not be greater than 100, changed to 100')
-                    if max_results < 1:
-                        max_results = 1
-                        print('max_results can not be smaller than 10, changed to 10')
-                    if type(tweet_ids) != list:
-                        tweet_ids = [tweet_ids]
-                    
-                    #users_json_response_lists = []
-                    tweet_ids_evaluated = []
-                    tweet_ids_didnt_evaluated = []
-                    next_tokens_users= [] #this will include a list where eachelement is a list containing all the tokens off the specific user
-                    path_for_table_dict = {}
-                    for tweet_id in tweet_ids:
-                        print("Bringing likes of", tweet_id)
-                        try:
-                            json_response_list, num_of_returned_likes,next_tokens, path_for_table =\
-                                self.__return_likes_of_tweet_id_SMALL(tweet_id=tweet_id,
-                                        max_results = max_results, evaluate_last_token = evaluate_last_token,
-                                        limit_amount_of_returned_likes = limit_amount_of_returned_likes,
-                                    verbose = verbose, dir_tree_name = dir_tree_name)
-                            
-                            path_for_table_dict[tweet_id] = path_for_table
+        """ ## Return users who liked given tweet Ids / converstion Ids 
 
-                            
-                            print(num_of_returned_likes)
-                            if num_of_returned_likes > 0:
-                                tweet_ids_evaluated.append(tweet_id)
-                                next_tokens_users.append(next_tokens)
-                        
+This function enalbes getting, for a list of tweet ids / conversation ids, all the users who liked those tweets.\n
 
-                            else:
-                                tweet_ids_didnt_evaluated.append(tweet_id)
-                                print("The tweet_id:", tweet_id, "had", num_of_returned_likes, "likes!!")
++ link to twitter-developer page regarding this capability:
+https://developer.twitter.com/en/docs/twitter-api/tweets/likes/api-reference/get-tweets-id-liking_users
 
-                            print("---------------------------------------------------------------")
-                        except:
-                            print("There was a problem with the tweet id:", tweet_id)
-                            tweet_ids_didnt_evaluated.append(tweet_id)
-                            print("*************************************************************************************")
+### App rate limit:
+        - App rate limit (OAuth 2.0 App Access Token): 75 requests per 15-minute window shared among all users of your app
+        - User rate limit (OAuth 2.0 user Access Token): 75 requests per 15-minute window per each authenticated user
 
-                    return path_for_table_dict
+### Parameters
+- tweet_ids: list --> a list with all the tweet-ids you wish to get all of their likes
+
+- max_results = The max number of likes to retrieve in a given call. Must be an integer between 1 to 100.
+
+- evaluate_last_token - by default = False--> If you have already retrive likes on the given tweet-id and you wish to continue retriving from the place you stopped, pass "True" to this arguemnt.
+
+- limit_amount_of_returned_likes - by default = 10000000 --> Lets say a given tweet had 5000 likes,
+and you wish to get only the first 2000 likes, then pass to this arguemnt 2000.
+It will automatically stop the function when it reaches the `limit_amount_of_returned_likes` you provided
+
+- verbose_10 - by default = False --> If True then the function will print certain things throught the run of the function.    
+
+- dir_tree_name: by default "conversation_trees" --> the dir name to put all the data from the function
+        """   
+        if max_results > 100:
+            max_results = 100
+            print('max_results can not be greater than 100, changed to 100')
+        if max_results < 1:
+            max_results = 1
+            print('max_results can not be smaller than 1, changed to 1')
+        if type(tweet_ids) != list:
+            tweet_ids = [tweet_ids]
+
+        #users_json_response_lists = []
+        tweet_ids_evaluated = []
+        tweet_ids_didnt_evaluated = []
+        next_tokens_users= [] #this will include a list where eachelement is a list containing all the tokens off the specific user
+        path_for_table_dict = {}
+        for tweet_id in tweet_ids:
+            print("Bringing likes of", tweet_id)
+            try:
+                json_response_list, num_of_returned_likes,next_tokens, path_for_table =\
+                    self.__return_likes_of_tweet_id_SMALL(tweet_id=tweet_id,
+                            max_results = max_results, evaluate_last_token = evaluate_last_token,
+                            limit_amount_of_returned_likes = limit_amount_of_returned_likes,
+                        verbose = verbose, dir_tree_name = dir_tree_name)
+
+                path_for_table_dict[tweet_id] = path_for_table
+
+                print(num_of_returned_likes)
+                if num_of_returned_likes > 0:
+                    tweet_ids_evaluated.append(tweet_id)
+                    next_tokens_users.append(next_tokens)
+
+                else:
+                    tweet_ids_didnt_evaluated.append(tweet_id)
+                    print("The tweet_id:", tweet_id, "had", num_of_returned_likes, "likes!!")
+
+                print("---------------------------------------------------------------")
+            except:
+                print("There was a problem with the tweet id:", tweet_id)
+                tweet_ids_didnt_evaluated.append(tweet_id)
+                print("*************************************************************************************")
+
+        return path_for_table_dict
 
 
-###### replies:
+########################################### replies: ############################################################
 # Twitter's API doesn't allow you to get replies to a particular tweet. Strange
 # but true. But you can use Twitter's Search API to search for tweets that are
-# directed at a particular user, and then search through the results to see if 
+# directed at a particular user, and then search through the results to see if
 # any are replies to a given tweet. You probably are also interested in the
-# replies to any replies as well, so the process is recursive. The big caveat 
-# here is that the search API only returns results for the last 7 days. So 
+# replies to any replies as well, so the process is recursive. The big caveat
+# here is that the search API only returns results for the last 7 days. So
 # you'll want to run this sooner rather than later.
 #### link: https://gist.github.com/edsu/54e6f7d63df3866a87a15aed17b51eaf
 
@@ -1316,7 +1379,7 @@ max_results = The max number of tweets to retrieve in a given call. Must be an i
                                         max_results = 10, evaluate_last_token = False,
                                         limit_amount_of_returned_comments = 10000000,
                                         verbose = False, dir_tree_name = "conversation_trees"):
-        
+
         from datetime import date
         if end_time == "today":
             #if you wish to get all the comments that were written till this day:
@@ -1327,7 +1390,7 @@ max_results = The max number of tweets to retrieve in a given call. Must be an i
         query = query + "conversation_id:"+ str(conversation_id)
 
         import os.path
-        #making a dir for the tree - this file will cintain a unique file for each conversation id
+        #making a dir for the tree - this file will contain a unique file for each conversation id
         #dir_tree_name = "conversation_trees"
         try:
             os.mkdir(dir_tree_name)
@@ -1338,7 +1401,7 @@ max_results = The max number of tweets to retrieve in a given call. Must be an i
 
         #making dir (inside the tree dir) to store, for each tweet-id all its quotes
         name_for_tweet_id = "conv_tree_for_" + str(tweet_id)
-        dir_name_for_tweet_id = os.path.join(dir_tree_name, name_for_tweet_id) 
+        dir_name_for_tweet_id = os.path.join(dir_tree_name, name_for_tweet_id)
         try:
             os.mkdir(dir_name_for_tweet_id)
             print("creating directory", dir_name_for_tweet_id, "to insert all the comments of the given conversation-id")
@@ -1346,7 +1409,7 @@ max_results = The max number of tweets to retrieve in a given call. Must be an i
             print("The dir", dir_name_for_tweet_id ,"already exist")
 
         ##### the log dir
-        dir_log_name = os.path.join(dir_name_for_tweet_id, "log_comments_for_conversation_id_" + tweet_id) 
+        dir_log_name = os.path.join(dir_name_for_tweet_id, "log_comments_for_conversation_id_" + tweet_id)
         try:
             os.mkdir(dir_log_name)
             print("creating directory", dir_log_name, "to insert all the logs of the comments for the tweet id - ", str(tweet_id))
@@ -1363,8 +1426,8 @@ max_results = The max number of tweets to retrieve in a given call. Must be an i
             current_time = "Current Time: " + current_time + "   *****************************************   "
             f.write(current_time + '\n\n')
 
-        ########### If the token file exist already, then take the last token available, else start from token 1  ############ 
-        tokens_location = os.path.join(dir_log_name, "tokens.txt") 
+        ########### If the token file exist already, then take the last token available, else start from token 1  ############
+        tokens_location = os.path.join(dir_log_name, "tokens.txt")
 
         if (evaluate_last_token == True and os.path.isfile(tokens_location) == True):
             a_file = open(tokens_location, "r")
@@ -1503,7 +1566,7 @@ max_results = The max number of tweets to retrieve in a given call. Must be an i
             if num_of_returned_comments >=limit_amount_of_returned_comments:
                 print("oooops, There may be more comments to return, but you asked to limit the amount of returned comments")
                 print("infact you got", num_of_returned_comments, "returned comments and limited the function to get", limit_amount_of_returned_comments, "comments")
-        
+
         return json_response_list, num_of_returned_comments, next_tokens, path_for_table
 
 #max result in comment function: 10 - 500
@@ -1514,8 +1577,44 @@ max_results = The max number of tweets to retrieve in a given call. Must be an i
                                 max_results = 10, evaluate_last_token = False,
                                 limit_amount_of_returned_comments = 10000000,
                                 verbose = False, dir_tree_name = "conversation_trees"):
-                                
-        
+        """ ## Return Replies for a given tweet Ids / converstion Ids 
+
+This function enalbes getting all the replies (comments) of a list of tweet ids / conversation ids
+
++ link to twitter-developer page regarding this capability:
+https://developer.twitter.com/en/docs/twitter-api/tweets/search/api-reference/get-tweets-search-all
+
+### App rate limit:
+    - App rate limit (OAuth 2.0 App Access Token): 300 requests per 15-minute window shared among all users of your app
+    - App rate limit (OAuth 2.0 App Access Token): 1 request per second shared among all users of your app
+
+### Parameters
+- conversation_ids: list --> a list with all the tweet-ids you wish to get all of their replies
+
+- query : str --> You can see the full documentation on how to build a query (what to pass in the `query` argument) in the following link:\n
+https://developer.twitter.com/en/docs/twitter-api/tweets/counts/integrate/build-a-query
+
+
+- start_time = The start time is the date-time that from it the function will look and rerieve replies to a certain tweet.\n
+Note that the format of the start time should be: "2015-12-7T00:00:00Z" (this is the default)
+
+- end_time = The end time is the date-time that till it the function will look and rerieve replies to a certain tweet.\n
+Note that the format of the end time should be: "2021-12-26T00:00:00Z".
+The defualt is "today", this automatically retrive all the comments written till this day
+
+- max_results = The max number of likes to retrieve in a given call. Must be an integer between 1 to 100.
+
+- evaluate_last_token - by default = False--> If you have already retrive likes on the given tweet-id and you wish to continue retriving from the place you stopped, pass "True" to this arguemnt.
+
+- limit_amount_of_returned_likes - by default = 10000000 --> Lets say a given tweet had 5000 likes,
+and you wish to get only the first 2000 likes, then pass to this arguemnt 2000.
+It will automatically stop the function when it reaches the `limit_amount_of_returned_likes` you provided
+
+- verbose_10 - by default = False --> If True then the function will print certain things throught the run of the function.    
+
+- dir_tree_name: by default "conversation_trees" --> the dir name to put all the data from the function
+        """
+
         tweet_ids = conversation_ids
         if max_results > 500:
             max_results = 500
@@ -1563,11 +1662,19 @@ max_results = The max number of tweets to retrieve in a given call. Must be an i
         return path_for_table_dict
 
 
-############################################### Filter function ##################################
-    """
+##################################################### Filter function ################################################
+   
+
+    def filter_tweets_Brexit(self, dir_with_all_tweets, score_for_KOP = 5, score_for_key_event = 5, score_for_key_words = 5,
+                            key_words = ["brexit", "eu", "deal"], threshold_score = 10,
+                            KOP_excel_name = "KOP brexit.xlsx",
+                            key_events_excel_name = "Brexit_key_events.xlsx",
+                            stop_words_to_add = ["https"], stop_words_file_name = "stopwords.txt",
+                            verbose = True):
+        """
     # Function filter tweets
 
-    We read numerous amount of tweets, comments, retweets and quotes from twitter. 
+    We read numerous amount of tweets, comments, retweets and quotes from twitter.
     Now we wish to create a function that, given a dataframe with  tweets / comments / quotes it will enable scoring them.
     The scoring will be based on the following parameters:
 
@@ -1611,14 +1718,7 @@ max_results = The max number of tweets to retrieve in a given call. Must be an i
     + **tweets_table** - The preprocessed tweets table with all the tweets - This table is identical to the `tweets_table_filtered` except that it also included tweets with score under the `threshold_score`
 
     + **csv_files_evaluated** = a list with all the **csv** files that the function read and add to the tweets table (the files are read from the location you provided in the argument: `dir_with_all_tweets`)
-    """
-
-    def filter_tweets_Brexit(self, dir_with_all_tweets, score_for_KOP = 5, score_for_key_event = 5, score_for_key_words = 5,
-                            key_words = ["brexit", "eu", "deal"], threshold_score = 10,
-                            KOP_excel_name = "KOP brexit.xlsx",
-                            key_events_excel_name = "Brexit_key_events.xlsx",
-                            stop_words_to_add = ["https"], stop_words_file_name = "stopwords.txt",
-                            verbose = True):
+        """
         start_fun_time = time.time()
         ############# step 1 - Reading the tweets data #############
         if verbose: print("Step 1: Reading all the csv files")
@@ -1632,17 +1732,17 @@ max_results = The max number of tweets to retrieve in a given call. Must be an i
                     tweets_tables.append(pd.read_csv(file_location))
 
         tweets_table = pd.concat(tweets_tables)
-        
+
         ############# step 2 - Reading events data #############
         if verbose: print("Step 2: Reading The Events Excel File")
         dir_path_for_events_table = os.path.join(key_events_excel_name)
         events_table = pd.read_excel(dir_path_for_events_table)
         events_table = events_table.drop(labels = ["tweets", "Arguments", "Index"], axis = 1)
         #display(events_table.head())
-        
+
         ############# step 3 - Reading KOP data #############
         if verbose: print("Step 3: Reading and preprocessing Key Opinion Leaders data")
-        dir_path_for_KOP_table = os.path.join(KOP_excel_name) 
+        dir_path_for_KOP_table = os.path.join(KOP_excel_name)
         KOP_table = pd.read_excel(dir_path_for_KOP_table)
         try:
             KOP_table.rename(columns = {'Unnamed: 0':'KOP_num',
@@ -1651,7 +1751,7 @@ max_results = The max number of tweets to retrieve in a given call. Must be an i
             #drop unnecessary columns
             KOP_table = KOP_table.drop(labels = ["Unnamed: 7", "Source"], axis = 1)
         except: print()
-        
+
         #remove KOP without twitter account name
         KOP_table = KOP_table[KOP_table['twitter_user_name'].notna()]
         #remove the "@" at the begining of some user names
@@ -1675,7 +1775,7 @@ max_results = The max number of tweets to retrieve in a given call. Must be an i
             stopwords = requests.get(stopwords_url).text.split()
             with open(stopwords_file_name,'w+t', encoding='utf-8') as out_file:
                 out_file.write(' '.join(stopwords))
-        else: 
+        else:
             with open(stopwords_file_name,'rt', encoding='utf-8') as in_file:
                 stopwords = in_file.readline().split()
         stopwords = set(stopwords)
@@ -1683,11 +1783,11 @@ max_results = The max number of tweets to retrieve in a given call. Must be an i
         #### Adding stopWords
         for word_i in stop_words_to_add:
             stopwords.add(word_i)
-            
+
         ############# step 5 - Preprocess the tweets table for scoring #############
         if verbose: print("\nStep 5: Preprocess the tweets table for scoring:\nRemoving Stop words\
         | bigram, trigram, forthgram | merging the tweets table with the KOP and Events tables | ")
-        
+
         start_time = time.time()
         #using gensim function to split the text into tokens
         tweets_table["text_tokens"] = tweets_table["text"].apply(gensim.utils.simple_preprocess,{"deacc":True, "min_len":2,"max_len":25})
@@ -1723,7 +1823,7 @@ max_results = The max number of tweets to retrieve in a given call. Must be an i
         def take_only_10_first_char(x):
             return(x[0:10])
         tweets_table["created_at_date"] = tweets_table["created_at"].apply(take_only_10_first_char)
-        tweets_table["created_at_date"] = pd.to_datetime(tweets_table["created_at_date"]) 
+        tweets_table["created_at_date"] = pd.to_datetime(tweets_table["created_at_date"])
 
         ### add column is_in_special_date that checks wheter the tweet was published in a special event day
         tweets_table['is_in_special_date'] = tweets_table['created_at_date'].apply(lambda x : pd.Series(x).isin(events_table["Date"]).any())
@@ -1743,9 +1843,9 @@ max_results = The max number of tweets to retrieve in a given call. Must be an i
             tweets_table['Role'] = tweets_table['Role'].fillna("No-KOP")
             tweets_table['Place'] = tweets_table['Place'].fillna("No-KOP")
         except: print()
-        
+
         if verbose: print("\nFinish preprocessing the tweets table, it took:", round(time.time() - start_time,3), "seconds")
-        
+
         ############# step 6 - Scoring #############
         if verbose: print("Step 6: Scoring the Tweets")
 
@@ -1777,12 +1877,12 @@ max_results = The max number of tweets to retrieve in a given call. Must be an i
 
         #tweets_table["total_score"]: adding the weights of each scorer
         tweets_table["total_score"] = score_for_key_words*tweets_table['score_key_words'] + score_for_key_event*tweets_table["is_in_special_date"] + score_for_KOP*tweets_table["score_KOP"]
-        
+
         #Geting a table with all the tweets that passed the score threshold
         tweets_table_filtered = tweets_table[tweets_table["total_score"]>=threshold_score].copy()
         #Sort the filtered table by score such that the tweets with the highest score will be first
         tweets_table_filtered.sort_values(by = "total_score", ascending=False, inplace=True)
-        
+
         print("\nFinish!\nTotal time:", round(time.time() - start_fun_time,3),
             "Seconds (",round((time.time() - start_fun_time)/60,3), "Minutes)")
 
@@ -1790,13 +1890,13 @@ max_results = The max number of tweets to retrieve in a given call. Must be an i
 
 
 
-
+############################################# Conversation Tree #############################################
 
 
     def get_conversation_tree(self, tweet_id : str ,max_results = 10,\
         tree_height = 1, evaluate_last_token = False,\
         limit_amount_of_returned_quotes = 10000000, verbose = False, dir_tree_name = "conversation_trees"):
-        
+
         print(f'tree_height: {tree_height}\n tweet_id: {tweet_id}')
 
         if(tree_height < 1):
@@ -1804,7 +1904,7 @@ max_results = The max number of tweets to retrieve in a given call. Must be an i
 
         path_for_table_dict = self.return_quotes_by_tweet_ids(tweet_ids=tweet_id, max_results=max_results,\
             limit_amount_of_returned_quotes = limit_amount_of_returned_quotes, verbose = verbose, dir_tree_name =dir_tree_name)
-        
+
         if not path_for_table_dict: return f"No retweets/quotes for tweet {tweet_id}"
 
         retweets_df = pd.read_csv( path_for_table_dict[tweet_id])
@@ -1818,8 +1918,8 @@ max_results = The max number of tweets to retrieve in a given call. Must be an i
             self.get_conversation_tree(tweet_id=retweet_id, max_results=max_results, tree_height = tree_height - 1,\
             limit_amount_of_returned_quotes = limit_amount_of_returned_quotes, verbose = verbose, dir_tree_name = dir_tree_name + '/conv_tree_for_' + tweet_id)
 
-            
-            
+
+
 
 
 
