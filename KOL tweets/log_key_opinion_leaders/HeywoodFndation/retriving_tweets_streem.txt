@@ -24,3 +24,12 @@ Total amount of tweets: 3484
 8 -> Got from twitter 498 tweets, and there are more tweets of that user to get, I am bringing more tweets!
 Total amount of tweets: 3982
 
+9 -> Got from twitter 499 tweets, and there are more tweets of that user to get, I am bringing more tweets!
+Total amount of tweets: 4481
+
+10 -> Got from twitter 500 tweets, and there are more tweets of that user to get, I am bringing more tweets!
+Total amount of tweets: 4981
+
+11 -> Got from twitter 396 tweets, and there are more tweets of that user to get, I am bringing more tweets!
+Total amount of tweets: 5377
+
