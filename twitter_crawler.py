@@ -350,7 +350,7 @@ max_results = The max number of tweets to retrieve in a given call. Must be an i
                 a.id = a.id.astype("string")
                 a["id_new"] = "id: " + a["id"].astype("string")
                 a["conv_id_new"] = "conv_id: " + a["conversation_id"].astype("string")
-                a["author_id_new"] = "author_id" + a["author_id"].astype("string")
+                a["author_id_new"] = "author_id: " + a["author_id"].astype("string")
 
             #c = pd.json_normalize(json_response["includes"]["places"]).add_prefix("places.")
                 df_tweets_i = pd.merge(a, b, left_on="author_id", right_on="users.id")
