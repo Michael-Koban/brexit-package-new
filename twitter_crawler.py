@@ -1885,8 +1885,9 @@ It will automatically stop the function when it reaches the `limit_amount_of_ret
 
         print("\nFinish!\nTotal time:", round(time.time() - start_fun_time,3),
             "Seconds (",round((time.time() - start_fun_time)/60,3), "Minutes)")
-
-        return (tweets_table_filtered, tweets_table, csv_files_evaluated, forthgram)
+            
+        bigrams_models = [bigram, trigram, forthgram]
+        return (tweets_table_filtered, tweets_table, csv_files_evaluated, bigrams_models)
 
 
 
