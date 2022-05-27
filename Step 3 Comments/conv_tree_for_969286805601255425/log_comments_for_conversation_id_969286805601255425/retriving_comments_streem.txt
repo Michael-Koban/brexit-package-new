@@ -1,0 +1,35 @@
+Current Time: 16:09:40 (Date: 27.05.22)   *****************************************   
+
+1 -> Got from twitter 100 comments, and there are more comments of that conversation-id to get, I am bringing more comments!
+Total amount of tweets: 100
+
+2 -> Got from twitter 100 comments, and there are more comments of that conversation-id to get, I am bringing more comments!
+Total amount of tweets: 200
+
+3 -> Got from twitter 99 comments, and there are more comments of that conversation-id to get, I am bringing more comments!
+Total amount of tweets: 299
+
+4 -> Got from twitter 100 comments, and there are more comments of that conversation-id to get, I am bringing more comments!
+Total amount of tweets: 399
+
+5 -> Got from twitter 100 comments, and there are more comments of that conversation-id to get, I am bringing more comments!
+Total amount of tweets: 499
+
+6 -> Got from twitter 99 comments, and there are more comments of that conversation-id to get, I am bringing more comments!
+Total amount of tweets: 598
+
+7 -> Got from twitter 98 comments, and there are more comments of that conversation-id to get, I am bringing more comments!
+Total amount of tweets: 696
+
+8 -> Got from twitter 94 comments, and there are more comments of that conversation-id to get, I am bringing more comments!
+Total amount of tweets: 790
+
+9 -> Got from twitter 100 comments, and there are more comments of that conversation-id to get, I am bringing more comments!
+Total amount of tweets: 890
+
+10 -> Got from twitter 99 comments, and there are more comments of that conversation-id to get, I am bringing more comments!
+Total amount of tweets: 989
+
+11 -> Got from twitter 34 comments, and there are more comments of that conversation-id to get, I am bringing more comments!
+Total amount of tweets: 1023
+

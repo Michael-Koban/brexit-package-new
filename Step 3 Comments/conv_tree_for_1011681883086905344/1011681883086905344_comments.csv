@@ -1,0 +1,225 @@
+,author_id,author_id_new,conv_id_new,conversation_id,created_at,entities.mentions,id,id_new,in_reply_to_user_id,lang,public_metrics.like_count,public_metrics.quote_count,public_metrics.reply_count,public_metrics.retweet_count,referenced_tweets,reply_settings,source,text,users.created_at,users.description,users.id,users.name,users.public_metrics.followers_count,users.public_metrics.following_count,users.public_metrics.listed_count,users.public_metrics.tweet_count,users.username,users.verified
+0,98340384,author_id: 98340384,coversation_id: 1011681883086905344,1011681883086905344,2019-06-09T08:10:11.000Z,"[{'start': 0, 'end': 11, 'username': 'ChrisStirk', 'id': '485231111'}, {'start': 12, 'end': 25, 'username': 'hilarybennmp', 'id': '408454349'}, {'start': 26, 'end': 38, 'username': 'LeftInsider', 'id': '889056755426222083'}, {'start': 39, 'end': 52, 'username': 'GeorgeAylett', 'id': '470489295'}]",1137632974067752960,id: 1137632974067752960,485231111,en,0,0,0,0,"[{'type': 'replied_to', 'id': '1137468436131528704'}]",everyone,Twitter Web App,@ChrisStirk @hilarybennmp @LeftInsider @GeorgeAylett Are you also tweeting Assad and Putin?,2009-12-21T10:03:15.000Z,"If you are a Brexiter, Tory, anti-vaxxers, flat earther, believe that one can self ID as a women, Republican, we are NOT going to see eye to eye!",98340384,Fifties Boro boy. 🇺🇦 EU❤️ 2+2 does not equal 5,4135,4322,15,40668,bazzarrooti,False
+1,485231111,author_id: 485231111,coversation_id: 1011681883086905344,1011681883086905344,2019-06-08T21:16:22.000Z,"[{'start': 0, 'end': 13, 'username': 'hilarybennmp', 'id': '408454349'}, {'start': 14, 'end': 26, 'username': 'LeftInsider', 'id': '889056755426222083'}, {'start': 27, 'end': 40, 'username': 'GeorgeAylett', 'id': '470489295'}]",1137468436131528704,id: 1137468436131528704,408454349,en,0,0,1,0,"[{'type': 'replied_to', 'id': '1011733628999667712'}]",everyone,Twitter Web Client,"@hilarybennmp @LeftInsider @GeorgeAylett If that's what you need to salve you conscience, you spoke out for that war.",2012-02-07T00:04:01.000Z,"A small business owner, Dyslexic fun for twitter, European Citizen & wishing to stay that way. Engish Lancashire Lass by birth, Scotland is my spiritual home",485231111,Ma Simpson's (Dr Chris),1639,835,5,56122,ChrisStirk,False
+2,45970216,author_id: 45970216,coversation_id: 1011681883086905344,1011681883086905344,2018-06-27T16:53:38.000Z,"[{'start': 10, 'end': 22, 'username': 'TheFibreman', 'id': '388499761'}, {'start': 23, 'end': 36, 'username': 'GeorgeAylett', 'id': '470489295'}]",1012016113335586816,id: 1012016113335586816,45970216,en,0,0,0,0,"[{'type': 'replied_to', 'id': '1012015625500282880'}]",everyone,Twitter Web App,"@Q_Hyphen @TheFibreman @GeorgeAylett @HappierAccident Fair point on Churchill, OK. Robin Cook, John Smith, both drinkers. Not uncommon in politics. Also both dead but more recently.",2009-06-09T22:59:27.000Z,"Local. Bit Gonzo
+Mostly harmless Library Assistant & Mum.
+Don't be a dick on purpose
+
+Vigilantly making notes
+""Offended archeologist""
+link 👇 to see I'm real",45970216,💙 Jane 🇺🇦 🕊️🌱,6251,992,34,185501,localnotail,False
+3,45970216,author_id: 45970216,coversation_id: 1011681883086905344,1011681883086905344,2018-06-27T16:51:42.000Z,"[{'start': 10, 'end': 22, 'username': 'TheFibreman', 'id': '388499761'}, {'start': 23, 'end': 36, 'username': 'GeorgeAylett', 'id': '470489295'}]",1012015625500282880,id: 1012015625500282880,724178408532533248,en,0,0,1,0,"[{'type': 'replied_to', 'id': '1012014758755749888'}]",everyone,Twitter Web App,@Q_Hyphen @TheFibreman @GeorgeAylett @HappierAccident Why does Corbyn credit the EU with getting worker's rights in law if they had nothing to do with it?,2009-06-09T22:59:27.000Z,"Local. Bit Gonzo
+Mostly harmless Library Assistant & Mum.
+Don't be a dick on purpose
+
+Vigilantly making notes
+""Offended archeologist""
+link 👇 to see I'm real",45970216,💙 Jane 🇺🇦 🕊️🌱,6251,992,34,185501,localnotail,False
+4,45970216,author_id: 45970216,coversation_id: 1011681883086905344,1011681883086905344,2018-06-27T16:42:53.000Z,"[{'start': 10, 'end': 22, 'username': 'TheFibreman', 'id': '388499761'}, {'start': 23, 'end': 36, 'username': 'GeorgeAylett', 'id': '470489295'}]",1012013407892049920,id: 1012013407892049920,724178408532533248,en,0,0,0,0,"[{'type': 'replied_to', 'id': '1012012685800759296'}]",everyone,Twitter Web App,"@Q_Hyphen @TheFibreman @GeorgeAylett @HappierAccident Churchill was regularly drunk. 
+Lots of good things for workers came out of EU laws &amp; regs. https://t.co/oDKtmjYEXZ",2009-06-09T22:59:27.000Z,"Local. Bit Gonzo
+Mostly harmless Library Assistant & Mum.
+Don't be a dick on purpose
+
+Vigilantly making notes
+""Offended archeologist""
+link 👇 to see I'm real",45970216,💙 Jane 🇺🇦 🕊️🌱,6251,992,34,185501,localnotail,False
+5,45970216,author_id: 45970216,coversation_id: 1011681883086905344,1011681883086905344,2018-06-27T16:36:40.000Z,"[{'start': 10, 'end': 22, 'username': 'TheFibreman', 'id': '388499761'}, {'start': 23, 'end': 36, 'username': 'GeorgeAylett', 'id': '470489295'}]",1012011844435873795,id: 1012011844435873795,724178408532533248,en,0,0,0,0,"[{'type': 'replied_to', 'id': '1012011261725429760'}]",everyone,Twitter Web App,@Q_Hyphen @TheFibreman @GeorgeAylett @HappierAccident Who should I have trusted? Thatcher? Major? Blair? Brown? Cameron? May?,2009-06-09T22:59:27.000Z,"Local. Bit Gonzo
+Mostly harmless Library Assistant & Mum.
+Don't be a dick on purpose
+
+Vigilantly making notes
+""Offended archeologist""
+link 👇 to see I'm real",45970216,💙 Jane 🇺🇦 🕊️🌱,6251,992,34,185501,localnotail,False
+6,45970216,author_id: 45970216,coversation_id: 1011681883086905344,1011681883086905344,2018-06-27T16:33:03.000Z,"[{'start': 10, 'end': 22, 'username': 'TheFibreman', 'id': '388499761'}, {'start': 23, 'end': 36, 'username': 'GeorgeAylett', 'id': '470489295'}]",1012010932560687104,id: 1012010932560687104,724178408532533248,en,0,0,0,0,"[{'type': 'replied_to', 'id': '1012009626123030529'}]",everyone,Twitter Web App,@Q_Hyphen @TheFibreman @GeorgeAylett @HappierAccident I trust the EU far more than any UK government I've been aware of in my lifetime,2009-06-09T22:59:27.000Z,"Local. Bit Gonzo
+Mostly harmless Library Assistant & Mum.
+Don't be a dick on purpose
+
+Vigilantly making notes
+""Offended archeologist""
+link 👇 to see I'm real",45970216,💙 Jane 🇺🇦 🕊️🌱,6251,992,34,185501,localnotail,False
+7,45970216,author_id: 45970216,coversation_id: 1011681883086905344,1011681883086905344,2018-06-27T16:20:55.000Z,"[{'start': 10, 'end': 22, 'username': 'TheFibreman', 'id': '388499761'}, {'start': 23, 'end': 36, 'username': 'GeorgeAylett', 'id': '470489295'}]",1012007881292513280,id: 1012007881292513280,724178408532533248,en,0,0,0,0,"[{'type': 'replied_to', 'id': '1012006231463071744'}]",everyone,Twitter Web App,"@Q_Hyphen @TheFibreman @GeorgeAylett @HappierAccident EU can't win really. If they try to have an impact they are told they are over-riding UK Sovereignty.
+UK Gov &amp; media constantly present the EU as an enemy not an ally, despite them investing heavily in raising people out of inequality, skills training &amp; environment protection",2009-06-09T22:59:27.000Z,"Local. Bit Gonzo
+Mostly harmless Library Assistant & Mum.
+Don't be a dick on purpose
+
+Vigilantly making notes
+""Offended archeologist""
+link 👇 to see I'm real",45970216,💙 Jane 🇺🇦 🕊️🌱,6251,992,34,185501,localnotail,False
+8,45970216,author_id: 45970216,coversation_id: 1011681883086905344,1011681883086905344,2018-06-27T16:09:29.000Z,"[{'start': 10, 'end': 22, 'username': 'TheFibreman', 'id': '388499761'}, {'start': 23, 'end': 36, 'username': 'GeorgeAylett', 'id': '470489295'}]",1012005004289433602,id: 1012005004289433602,724178408532533248,en,0,0,0,0,"[{'type': 'quoted', 'id': '994870610990911488'}, {'type': 'replied_to', 'id': '1012003937082372097'}]",everyone,Twitter Web App,"@Q_Hyphen @TheFibreman @GeorgeAylett @HappierAccident OK, but failure of UKGov to foster involvement in the EU is no reason to abandon the project, especially when it *will* harm our economy so much.
+These are notes from a recent Brexit Regional Impact business strategy planning meeting. Not a Remainer event https://t.co/OVNHOojN7Z",2009-06-09T22:59:27.000Z,"Local. Bit Gonzo
+Mostly harmless Library Assistant & Mum.
+Don't be a dick on purpose
+
+Vigilantly making notes
+""Offended archeologist""
+link 👇 to see I'm real",45970216,💙 Jane 🇺🇦 🕊️🌱,6251,992,34,185501,localnotail,False
+9,45970216,author_id: 45970216,coversation_id: 1011681883086905344,1011681883086905344,2018-06-27T16:00:20.000Z,"[{'start': 10, 'end': 22, 'username': 'TheFibreman', 'id': '388499761'}, {'start': 23, 'end': 36, 'username': 'GeorgeAylett', 'id': '470489295'}]",1012002699401973760,id: 1012002699401973760,724178408532533248,en,0,0,0,0,"[{'type': 'replied_to', 'id': '1012002077155962885'}]",everyone,Twitter Web App,@Q_Hyphen @TheFibreman @GeorgeAylett @HappierAccident What do you base this belief that Brexit will be good for the country as a whole on please?,2009-06-09T22:59:27.000Z,"Local. Bit Gonzo
+Mostly harmless Library Assistant & Mum.
+Don't be a dick on purpose
+
+Vigilantly making notes
+""Offended archeologist""
+link 👇 to see I'm real",45970216,💙 Jane 🇺🇦 🕊️🌱,6251,992,34,185501,localnotail,False
+10,45970216,author_id: 45970216,coversation_id: 1011681883086905344,1011681883086905344,2018-06-27T15:53:08.000Z,"[{'start': 10, 'end': 22, 'username': 'TheFibreman', 'id': '388499761'}, {'start': 23, 'end': 36, 'username': 'GeorgeAylett', 'id': '470489295'}]",1012000890251808769,id: 1012000890251808769,724178408532533248,en,0,0,0,0,"[{'type': 'replied_to', 'id': '1012000202281103360'}]",everyone,Twitter Web App,"@Q_Hyphen @TheFibreman @GeorgeAylett @HappierAccident None so blind as will not see. 
+At least the right wing of the Brexiters doesn't pretend it's not going to be a disaster for the working class. They just don't care. You should.",2009-06-09T22:59:27.000Z,"Local. Bit Gonzo
+Mostly harmless Library Assistant & Mum.
+Don't be a dick on purpose
+
+Vigilantly making notes
+""Offended archeologist""
+link 👇 to see I'm real",45970216,💙 Jane 🇺🇦 🕊️🌱,6251,992,34,185501,localnotail,False
+11,45970216,author_id: 45970216,coversation_id: 1011681883086905344,1011681883086905344,2018-06-27T15:39:06.000Z,"[{'start': 10, 'end': 22, 'username': 'TheFibreman', 'id': '388499761'}, {'start': 23, 'end': 36, 'username': 'GeorgeAylett', 'id': '470489295'}]",1011997357423185920,id: 1011997357423185920,724178408532533248,en,0,0,0,0,"[{'type': 'replied_to', 'id': '1011993168697577472'}]",everyone,Twitter Web App,"@Q_Hyphen @TheFibreman @GeorgeAylett @HappierAccident Maybe you haven't been paying attention but all the credible impact assessments show we're heading for a GDP hit at least 3x the one we took in the global crash
+Business is warning us,  unions are warning us, NHS staff are warning us.
+How much more do you need b4 you're convinced",2009-06-09T22:59:27.000Z,"Local. Bit Gonzo
+Mostly harmless Library Assistant & Mum.
+Don't be a dick on purpose
+
+Vigilantly making notes
+""Offended archeologist""
+link 👇 to see I'm real",45970216,💙 Jane 🇺🇦 🕊️🌱,6251,992,34,185501,localnotail,False
+12,45970216,author_id: 45970216,coversation_id: 1011681883086905344,1011681883086905344,2018-06-27T14:07:44.000Z,"[{'start': 10, 'end': 22, 'username': 'TheFibreman', 'id': '388499761'}, {'start': 23, 'end': 36, 'username': 'GeorgeAylett', 'id': '470489295'}]",1011974365217517568,id: 1011974365217517568,724178408532533248,en,0,0,0,0,"[{'type': 'replied_to', 'id': '1011968410593488897'}]",everyone,Twitter Web App,"@Q_Hyphen @TheFibreman @GeorgeAylett @HappierAccident Brexit means diverting £Bs to replicate systems &amp; agencies we have access to through EU
+Damaging our economy means less money in revenue, more unemployment so even less money for public funds that'll be needed more than ever but our credit rating will drop too so harder to borrow",2009-06-09T22:59:27.000Z,"Local. Bit Gonzo
+Mostly harmless Library Assistant & Mum.
+Don't be a dick on purpose
+
+Vigilantly making notes
+""Offended archeologist""
+link 👇 to see I'm real",45970216,💙 Jane 🇺🇦 🕊️🌱,6251,992,34,185501,localnotail,False
+13,45970216,author_id: 45970216,coversation_id: 1011681883086905344,1011681883086905344,2018-06-27T13:28:08.000Z,"[{'start': 10, 'end': 22, 'username': 'TheFibreman', 'id': '388499761'}, {'start': 23, 'end': 36, 'username': 'GeorgeAylett', 'id': '470489295'}]",1011964395964989440,id: 1011964395964989440,724178408532533248,en,0,0,0,0,"[{'type': 'replied_to', 'id': '1011962947025895427'}]",everyone,Twitter Web Client,"@Q_Hyphen @TheFibreman @GeorgeAylett @HappierAccident Pointing to some bad things associated with EU membership doesn't change the fact that Brexit at this point in history after almost a decade of austerity is really, really REALLY bad for Britain &amp; especially for the working class. 
+Brexit will make austerity look like a spa trip. https://t.co/URkSBgoxx6",2009-06-09T22:59:27.000Z,"Local. Bit Gonzo
+Mostly harmless Library Assistant & Mum.
+Don't be a dick on purpose
+
+Vigilantly making notes
+""Offended archeologist""
+link 👇 to see I'm real",45970216,💙 Jane 🇺🇦 🕊️🌱,6251,992,34,185501,localnotail,False
+14,45970216,author_id: 45970216,coversation_id: 1011681883086905344,1011681883086905344,2018-06-27T12:56:22.000Z,"[{'start': 10, 'end': 22, 'username': 'TheFibreman', 'id': '388499761'}, {'start': 23, 'end': 36, 'username': 'GeorgeAylett', 'id': '470489295'}]",1011956402418483201,id: 1011956402418483201,45970216,en,0,0,0,0,"[{'type': 'replied_to', 'id': '1011954990401970176'}]",everyone,Twitter Web Client,"@Q_Hyphen @TheFibreman @GeorgeAylett @HappierAccident BTW are you aware that at least half of the people pushing for Brexit right now are right-wing nationalists demanding Brexit to avoid further integration with the Communist EUSSR?
+Who is right about the EU? Both sides seem very certain. Can't both be though. Maybe neither?",2009-06-09T22:59:27.000Z,"Local. Bit Gonzo
+Mostly harmless Library Assistant & Mum.
+Don't be a dick on purpose
+
+Vigilantly making notes
+""Offended archeologist""
+link 👇 to see I'm real",45970216,💙 Jane 🇺🇦 🕊️🌱,6251,992,34,185501,localnotail,False
+15,45970216,author_id: 45970216,coversation_id: 1011681883086905344,1011681883086905344,2018-06-27T12:50:45.000Z,"[{'start': 10, 'end': 22, 'username': 'TheFibreman', 'id': '388499761'}, {'start': 23, 'end': 36, 'username': 'GeorgeAylett', 'id': '470489295'}]",1011954990401970176,id: 1011954990401970176,724178408532533248,en,0,0,1,0,"[{'type': 'replied_to', 'id': '1011952350561435650'}]",everyone,Twitter Web Client,@Q_Hyphen @TheFibreman @GeorgeAylett @HappierAccident You think tax avoidance reform is for the worse? We should work with our fellow states to influence reforms &amp; steer away from right wing nationalism not run away. https://t.co/GGjS4pdm9d,2009-06-09T22:59:27.000Z,"Local. Bit Gonzo
+Mostly harmless Library Assistant & Mum.
+Don't be a dick on purpose
+
+Vigilantly making notes
+""Offended archeologist""
+link 👇 to see I'm real",45970216,💙 Jane 🇺🇦 🕊️🌱,6251,992,34,185501,localnotail,False
+16,45970216,author_id: 45970216,coversation_id: 1011681883086905344,1011681883086905344,2018-06-27T12:35:58.000Z,"[{'start': 10, 'end': 22, 'username': 'TheFibreman', 'id': '388499761'}, {'start': 23, 'end': 36, 'username': 'GeorgeAylett', 'id': '470489295'}]",1011951271325159425,id: 1011951271325159425,45970216,en,0,0,0,0,"[{'type': 'replied_to', 'id': '1011950530896244737'}]",everyone,Twitter Web Client,@Q_Hyphen @TheFibreman @GeorgeAylett @HappierAccident EU reforms constantly. Maybe not as fast as it should but it does happen. Just passed a law making it illegal for unscrupulous employers to use migrant workers to undercut wages. https://t.co/u5mjYveHcq,2009-06-09T22:59:27.000Z,"Local. Bit Gonzo
+Mostly harmless Library Assistant & Mum.
+Don't be a dick on purpose
+
+Vigilantly making notes
+""Offended archeologist""
+link 👇 to see I'm real",45970216,💙 Jane 🇺🇦 🕊️🌱,6251,992,34,185501,localnotail,False
+17,45970216,author_id: 45970216,coversation_id: 1011681883086905344,1011681883086905344,2018-06-27T12:33:02.000Z,"[{'start': 10, 'end': 22, 'username': 'TheFibreman', 'id': '388499761'}, {'start': 23, 'end': 36, 'username': 'GeorgeAylett', 'id': '470489295'}]",1011950530896244737,id: 1011950530896244737,724178408532533248,en,1,0,1,0,"[{'type': 'replied_to', 'id': '1011948602124587008'}]",everyone,Twitter Web Client,"@Q_Hyphen @TheFibreman @GeorgeAylett @HappierAccident Labour say we are better off in the EU #RemainReform
+Corbyn says he would still vote Remain.
+
+EU anti-tax avoidance reforms that were announced March 2016 come into force in 2019. That's why 5 of the richest tax-avoiding businessmen in the UK bought Brexit https://t.co/oKMH8jaBMf",2009-06-09T22:59:27.000Z,"Local. Bit Gonzo
+Mostly harmless Library Assistant & Mum.
+Don't be a dick on purpose
+
+Vigilantly making notes
+""Offended archeologist""
+link 👇 to see I'm real",45970216,💙 Jane 🇺🇦 🕊️🌱,6251,992,34,185501,localnotail,False
+18,45970216,author_id: 45970216,coversation_id: 1011681883086905344,1011681883086905344,2018-06-27T12:17:58.000Z,"[{'start': 0, 'end': 12, 'username': 'TheFibreman', 'id': '388499761'}, {'start': 23, 'end': 36, 'username': 'GeorgeAylett', 'id': '470489295'}]",1011946738364682241,id: 1011946738364682241,388499761,en,0,0,0,0,"[{'type': 'replied_to', 'id': '1011932471242444800'}]",everyone,Twitter Web App,@TheFibreman @Q_Hyphen @GeorgeAylett @HappierAccident So unite with us and help to #BinBrexit by supporting a #PeoplesVote https://t.co/HfPm8aHox3,2009-06-09T22:59:27.000Z,"Local. Bit Gonzo
+Mostly harmless Library Assistant & Mum.
+Don't be a dick on purpose
+
+Vigilantly making notes
+""Offended archeologist""
+link 👇 to see I'm real",45970216,💙 Jane 🇺🇦 🕊️🌱,6251,992,34,185501,localnotail,False
+19,45970216,author_id: 45970216,coversation_id: 1011681883086905344,1011681883086905344,2018-06-27T07:32:11.000Z,"[{'start': 0, 'end': 12, 'username': 'TheFibreman', 'id': '388499761'}, {'start': 13, 'end': 26, 'username': 'GeorgeAylett', 'id': '470489295'}]",1011874820122914816,id: 1011874820122914816,388499761,en,0,0,0,0,"[{'type': 'replied_to', 'id': '1011864563208290304'}]",everyone,Twitter Web App,"@TheFibreman @GeorgeAylett @HappierAccident That's really presumptuous of you, and only serves to enable Labour's failure to stand up &amp; try to #StopBrexit.
+
+Most people I speak to who voted Leave weren't even aware of Labour's #RemainReform stance.
+Unsurprising it didn't get much coverage as it rightly blames Tories not EU https://t.co/jY1d1p37pz",2009-06-09T22:59:27.000Z,"Local. Bit Gonzo
+Mostly harmless Library Assistant & Mum.
+Don't be a dick on purpose
+
+Vigilantly making notes
+""Offended archeologist""
+link 👇 to see I'm real",45970216,💙 Jane 🇺🇦 🕊️🌱,6251,992,34,185501,localnotail,False
+20,45970216,author_id: 45970216,coversation_id: 1011681883086905344,1011681883086905344,2018-06-26T19:08:32.000Z,"[{'start': 0, 'end': 13, 'username': 'GeorgeAylett', 'id': '470489295'}]",1011687674523078657,id: 1011687674523078657,45970216,en,0,0,1,0,"[{'type': 'replied_to', 'id': '1011686951358029824'}]",everyone,Twitter Web App,"@GeorgeAylett @HappierAccident After all, the Big Brexit Survey 2018 results from 80,000 people said 82% of Labour members &amp; 81% of Labour voters would back a referendum on the terms of Britain’s departure from EU.
+
+39% said we should “abandon Brexit completely” &amp; keep Britain in the EU
+https://t.co/PA0ZgMRzs0",2009-06-09T22:59:27.000Z,"Local. Bit Gonzo
+Mostly harmless Library Assistant & Mum.
+Don't be a dick on purpose
+
+Vigilantly making notes
+""Offended archeologist""
+link 👇 to see I'm real",45970216,💙 Jane 🇺🇦 🕊️🌱,6251,992,34,185501,localnotail,False
+21,45970216,author_id: 45970216,coversation_id: 1011681883086905344,1011681883086905344,2018-06-26T19:05:40.000Z,"[{'start': 0, 'end': 13, 'username': 'GeorgeAylett', 'id': '470489295'}]",1011686951358029824,id: 1011686951358029824,45970216,en,0,0,1,0,"[{'type': 'replied_to', 'id': '1011686809376641027'}]",everyone,Twitter Web App,"@GeorgeAylett @HappierAccident Maybe if someone in authority who is on record as saying Remain is best for Britain actually spoke out for the need for one given the damage it will do and the obvious lies &amp; corruption of the first one
+then even more would support a #PeoplesVote? https://t.co/8IKBlVF7ya",2009-06-09T22:59:27.000Z,"Local. Bit Gonzo
+Mostly harmless Library Assistant & Mum.
+Don't be a dick on purpose
+
+Vigilantly making notes
+""Offended archeologist""
+link 👇 to see I'm real",45970216,💙 Jane 🇺🇦 🕊️🌱,6251,992,34,185501,localnotail,False
+22,45970216,author_id: 45970216,coversation_id: 1011681883086905344,1011681883086905344,2018-06-26T19:05:06.000Z,"[{'start': 0, 'end': 13, 'username': 'GeorgeAylett', 'id': '470489295'}]",1011686809376641027,id: 1011686809376641027,470489295,en,0,0,1,0,"[{'type': 'replied_to', 'id': '1011685330989314049'}]",everyone,Twitter Web App,"@GeorgeAylett @HappierAccident 2 year anniversary Survation poll has 48% in favour of a second referendum while only 25% oppose it. 
+#PeoplesVote
+https://t.co/b5I7Si83Rm",2009-06-09T22:59:27.000Z,"Local. Bit Gonzo
+Mostly harmless Library Assistant & Mum.
+Don't be a dick on purpose
+
+Vigilantly making notes
+""Offended archeologist""
+link 👇 to see I'm real",45970216,💙 Jane 🇺🇦 🕊️🌱,6251,992,34,185501,localnotail,False
+23,45970216,author_id: 45970216,coversation_id: 1011681883086905344,1011681883086905344,2018-06-26T18:57:41.000Z,"[{'start': 0, 'end': 13, 'username': 'GeorgeAylett', 'id': '470489295'}]",1011684942798053378,id: 1011684942798053378,470489295,en,1,0,1,0,"[{'type': 'replied_to', 'id': '1011683703599312896'}]",everyone,Twitter Web App,"@GeorgeAylett @HappierAccident They didn't get elected.
+They can change policy to reflect the increasing need for a #PeoplesVote to #StopBrexit #ForTheMany in light of numerous negative impact assessments &amp; #BrexitConcerns, plus the views of their members, voters &amp; the unions who they are supposed to represent https://t.co/zYXcSzp3uU",2009-06-09T22:59:27.000Z,"Local. Bit Gonzo
+Mostly harmless Library Assistant & Mum.
+Don't be a dick on purpose
+
+Vigilantly making notes
+""Offended archeologist""
+link 👇 to see I'm real",45970216,💙 Jane 🇺🇦 🕊️🌱,6251,992,34,185501,localnotail,False
+24,45970216,author_id: 45970216,coversation_id: 1011681883086905344,1011681883086905344,2018-06-26T18:50:49.000Z,"[{'start': 0, 'end': 13, 'username': 'GeorgeAylett', 'id': '470489295'}]",1011683217764769793,id: 1011683217764769793,470489295,en,2,0,1,0,"[{'type': 'replied_to', 'id': '1011681883086905344'}]",everyone,Twitter Web App,"@GeorgeAylett @HappierAccident He could've sent a video of support. If he'd wanted to. 
+Could've not whipped the Lords to abstain on a #PeoplesVote too.
+
+People are frustrated because it's hard not to interpret this as Corbyn not wanting to let The People have final say on whether we should commit Brexit",2009-06-09T22:59:27.000Z,"Local. Bit Gonzo
+Mostly harmless Library Assistant & Mum.
+Don't be a dick on purpose
+
+Vigilantly making notes
+""Offended archeologist""
+link 👇 to see I'm real",45970216,💙 Jane 🇺🇦 🕊️🌱,6251,992,34,185501,localnotail,False
+25,45827690,author_id: 45827690,coversation_id: 1011681883086905344,1011681883086905344,2018-06-27T14:55:32.000Z,"[{'start': 0, 'end': 13, 'username': 'GeorgeAylett', 'id': '470489295'}]",1011986394884001792,id: 1011986394884001792,470489295,en,0,0,0,0,"[{'type': 'replied_to', 'id': '1011681883086905344'}]",everyone,Twitter for Android,@GeorgeAylett You don't think it was conveniently timed? I'm not sure Corbyn would have turned up even if he was free but very convenient timing.,2009-06-09T12:42:14.000Z,"Fairly liberal, centre-left(ish), Lib Dem.
+Header picture is a sunset on Mars taken by NASA's Spirit Rover. Quote by Scroobius Pip.",45827690,George Simkin,372,1624,6,37645,George_Simkin,False
+26,388499761,author_id: 388499761,coversation_id: 1011681883086905344,1011681883086905344,2018-06-27T11:21:16.000Z,"[{'start': 10, 'end': 22, 'username': 'localnotail', 'id': '45970216'}, {'start': 23, 'end': 36, 'username': 'GeorgeAylett', 'id': '470489295'}]",1011932471242444800,id: 1011932471242444800,724178408532533248,en,0,0,1,0,"[{'type': 'replied_to', 'id': '1011912358703386624'}]",everyone,Twitter Web Client,"@Q_Hyphen @localnotail @GeorgeAylett @HappierAccident Like I say, divided we fall... #Brexit",2011-10-10T21:05:18.000Z,"Video: https://t.co/Ia0cXe13Ll…
+Music: https://t.co/R3776Hs4jt
+Stills: https://t.co/W7xS7tCO1K…
+#ActuallyAutistic",388499761,Fibreman,924,1662,11,31630,TheFibreman,False
+27,388499761,author_id: 388499761,coversation_id: 1011681883086905344,1011681883086905344,2018-06-27T06:51:26.000Z,"[{'start': 0, 'end': 12, 'username': 'localnotail', 'id': '45970216'}, {'start': 13, 'end': 26, 'username': 'GeorgeAylett', 'id': '470489295'}]",1011864563208290304,id: 1011864563208290304,45970216,en,0,0,1,0,"[{'type': 'replied_to', 'id': '1011687674523078657'}]",everyone,Twitter Web Client,"@localnotail @GeorgeAylett @HappierAccident The problem is, any 2nd ref would be laden with the same issues as the first one. The same #FBPE-ers telling working classes to do the sensible thing. Really worked last time, didn't it? That division hasn't been solved, so if you REALLY want to hand the Tories a giant mandate...",2011-10-10T21:05:18.000Z,"Video: https://t.co/Ia0cXe13Ll…
+Music: https://t.co/R3776Hs4jt
+Stills: https://t.co/W7xS7tCO1K…
+#ActuallyAutistic",388499761,Fibreman,924,1662,11,31630,TheFibreman,False
+28,79432435,author_id: 79432435,coversation_id: 1011681883086905344,1011681883086905344,2018-06-26T22:31:11.000Z,"[{'start': 0, 'end': 13, 'username': 'GeorgeAylett', 'id': '470489295'}]",1011738672725676034,id: 1011738672725676034,470489295,en,0,0,0,0,"[{'type': 'replied_to', 'id': '1011681883086905344'}]",everyone,Twitter for iPhone,"@GeorgeAylett Sure all 80,000 were pleased to see him, did they sing his song, come on get real.",2009-10-03T10:54:07.000Z,"Father husband,brother,cousin, friend and Newcastle United supporter all things I am proud to be called. Zero fool tolerance.",79432435,David Ronsdale,112,469,0,4670,rons59,False
+29,408454349,author_id: 408454349,coversation_id: 1011681883086905344,1011681883086905344,2018-06-26T22:11:08.000Z,"[{'start': 0, 'end': 12, 'username': 'LeftInsider', 'id': '889056755426222083'}, {'start': 13, 'end': 26, 'username': 'GeorgeAylett', 'id': '470489295'}]",1011733628999667712,id: 1011733628999667712,889056755426222083,en,4,1,1,0,"[{'type': 'replied_to', 'id': '1011683837900935174'}]",everyone,Twitter for iPhone,@LeftInsider @GeorgeAylett Not so. 1. The destruction of much of Syria's infrastructure was down to Presidents Assad and Putin. 2. Daesh have been largely defeated on the ground and the people they enslaved have been liberated.,2011-11-09T12:58:34.000Z,Labour MP for Leeds Central  https://t.co/JE6sKUUGGY,408454349,Hilary Benn,169946,369,1368,10006,hilarybennmp,True
+30,119829236,author_id: 119829236,coversation_id: 1011681883086905344,1011681883086905344,2018-06-26T21:34:09.000Z,"[{'start': 0, 'end': 13, 'username': 'GeorgeAylett', 'id': '470489295'}, {'start': 14, 'end': 30, 'username': 'nataliefaulkner', 'id': '1161015099110416386'}]",1011724319041433600,id: 1011724319041433600,470489295,en,1,0,0,0,"[{'type': 'replied_to', 'id': '1011723610115977218'}]",everyone,Twitter for Android,@GeorgeAylett @nataliefaulkner Completely clear to me. And if he let party members have a say in our position it might be different but then when it comes to policy he doesn't agree with we're shut out. So much for party democracy.,2010-03-04T19:33:25.000Z,"Married to a man, father of 2 amazing boys. Woke and proud. Flags in order of identity!",119829236,Simon HM 🏳️‍🌈🇪🇺 🌹 🇬🇧,417,1026,3,6026,SiHarrisonMorse,False
+31,119829236,author_id: 119829236,coversation_id: 1011681883086905344,1011681883086905344,2018-06-26T21:30:20.000Z,"[{'start': 0, 'end': 13, 'username': 'GeorgeAylett', 'id': '470489295'}, {'start': 14, 'end': 30, 'username': 'nataliefaulkner', 'id': '1161015099110416386'}]",1011723359233675264,id: 1011723359233675264,470489295,en,0,0,1,0,"[{'type': 'replied_to', 'id': '1011684249257299971'}]",everyone,Twitter for Android,@GeorgeAylett @nataliefaulkner She was suggesting he sent a video in support of the protest not to the refugees! Doh,2010-03-04T19:33:25.000Z,"Married to a man, father of 2 amazing boys. Woke and proud. Flags in order of identity!",119829236,Simon HM 🏳️‍🌈🇪🇺 🌹 🇬🇧,417,1026,3,6026,SiHarrisonMorse,False
+32,1252121052,author_id: 1252121052,coversation_id: 1011681883086905344,1011681883086905344,2018-06-26T21:33:16.000Z,"[{'start': 0, 'end': 13, 'username': 'GeorgeAylett', 'id': '470489295'}]",1011724099343863814,id: 1011724099343863814,470489295,en,0,0,0,0,"[{'type': 'replied_to', 'id': '1011681883086905344'}]",everyone,Twitter for iPhone,@GeorgeAylett I guess it was merely ‘convenient’ that his last minute trip happened to coincide with a really good excuse to not be marching.,2013-03-08T16:16:26.000Z,Metaverse,1252121052,MrMetaverse,448,720,4,6735,Metaversethree,False
+33,470489295,author_id: 470489295,coversation_id: 1011681883086905344,1011681883086905344,2018-06-26T21:31:20.000Z,"[{'start': 0, 'end': 16, 'username': 'SiHarrisonMorse', 'id': '119829236'}, {'start': 17, 'end': 33, 'username': 'nataliefaulkner', 'id': '1161015099110416386'}]",1011723610115977218,id: 1011723610115977218,119829236,en,1,0,1,0,"[{'type': 'replied_to', 'id': '1011723359233675264'}]",everyone,Twitter for iPhone,"@SiHarrisonMorse @nataliefaulkner 1) Really?
+2) It wasn’t clear
+3) Why though? Labour’s position is extremely clear and the party have ruled out a 2nd referendum countless times?",2012-01-21T20:31:26.000Z,"Once ran for Parliament. Terrible at running. Socialist, trade unionist, environmentalist, PhD student and I also make TikToks. He/him.",470489295,George Aylett,245070,267606,642,105059,GeorgeAylett,True
+34,470489295,author_id: 470489295,coversation_id: 1011681883086905344,1011681883086905344,2018-06-26T18:59:13.000Z,"[{'start': 0, 'end': 12, 'username': 'localnotail', 'id': '45970216'}]",1011685330989314049,id: 1011685330989314049,45970216,en,4,0,1,1,"[{'type': 'quoted', 'id': '1011656949514035202'}, {'type': 'replied_to', 'id': '1011684942798053378'}]",everyone,Twitter for iPhone,@localnotail @HappierAccident See YouGov’s recent poll - just 21% support a 2nd referendum. It’s not a view held by a majority. https://t.co/2Cps5aGQ8D,2012-01-21T20:31:26.000Z,"Once ran for Parliament. Terrible at running. Socialist, trade unionist, environmentalist, PhD student and I also make TikToks. He/him.",470489295,George Aylett,245070,267606,642,105059,GeorgeAylett,True
+35,470489295,author_id: 470489295,coversation_id: 1011681883086905344,1011681883086905344,2018-06-26T18:54:55.000Z,"[{'start': 0, 'end': 16, 'username': 'nataliefaulkner', 'id': '1161015099110416386'}]",1011684249257299971,id: 1011684249257299971,20927442,en,5,0,2,0,"[{'type': 'replied_to', 'id': '1011683562049953797'}]",everyone,Twitter for iPhone,"@nataliefaulkner This is one of the responses I’ve already received: “he should’ve sent a video” 🤦‍♂️ 
+
+Visiting the place at the heart of the refugee crisis and listening to people’s experiences can help solve the crisis by having input from the people impacted by it.
+
+But ‘stop Brexit init’",2012-01-21T20:31:26.000Z,"Once ran for Parliament. Terrible at running. Socialist, trade unionist, environmentalist, PhD student and I also make TikToks. He/him.",470489295,George Aylett,245070,267606,642,105059,GeorgeAylett,True
+36,470489295,author_id: 470489295,coversation_id: 1011681883086905344,1011681883086905344,2018-06-26T18:52:45.000Z,"[{'start': 0, 'end': 12, 'username': 'localnotail', 'id': '45970216'}]",1011683703599312896,id: 1011683703599312896,45970216,en,7,0,1,0,"[{'type': 'replied_to', 'id': '1011683217764769793'}]",everyone,Twitter for iPhone,@localnotail @HappierAccident Labour haven’t committed to a 2nd referendum - it wasn’t in their manifesto. That’s very clear and on public record.,2012-01-21T20:31:26.000Z,"Once ran for Parliament. Terrible at running. Socialist, trade unionist, environmentalist, PhD student and I also make TikToks. He/him.",470489295,George Aylett,245070,267606,642,105059,GeorgeAylett,True
+37,491443745,author_id: 491443745,coversation_id: 1011681883086905344,1011681883086905344,2018-06-26T20:22:28.000Z,"[{'start': 0, 'end': 13, 'username': 'GeorgeAylett', 'id': '470489295'}, {'start': 14, 'end': 30, 'username': 'nataliefaulkner', 'id': '1161015099110416386'}]",1011706282460491778,id: 1011706282460491778,470489295,en,0,0,0,0,"[{'type': 'replied_to', 'id': '1011684249257299971'}]",everyone,Twitter Web App,"@GeorgeAylett @nataliefaulkner So the EU summit on refugees is on 29/30, EU leaders had an emergency meeting sunday. So Corbyn goes in a time to avoid missing parliament, to coincide with that and raise awareness and the spoilt #FBPE are whining. FFS",2012-02-13T16:55:49.000Z,Will engineer for fudd. I care. That's my biggest weakness.,491443745,#RefugeesWelcome; Twitting Dinosaur 💙 💚 🖐,2424,2700,14,33072,TwitDinosaur,False
+38,140739598,author_id: 140739598,coversation_id: 1011681883086905344,1011681883086905344,2018-06-26T19:59:17.000Z,"[{'start': 0, 'end': 13, 'username': 'GeorgeAylett', 'id': '470489295'}]",1011700446120079362,id: 1011700446120079362,470489295,en,0,0,0,0,"[{'type': 'replied_to', 'id': '1011681883086905344'}]",everyone,Twitter for iPad,@GeorgeAylett It’s very commendable to visit the refugee camp but the Heathrow vote is a MAJOR issue that will hugely affect the country he wishes to be primeminister of.  He should have prioritized that &amp; rescheduled the other. You do him no favours by supporting this sort of decision making.,2010-05-06T08:04:26.000Z,Me (immigrant),140739598,Benjamin,299,1235,29,70602,benvenceremos,False
+39,249318908,author_id: 249318908,coversation_id: 1011681883086905344,1011681883086905344,2018-06-26T19:48:22.000Z,"[{'start': 0, 'end': 13, 'username': 'GeorgeAylett', 'id': '470489295'}]",1011697697118703621,id: 1011697697118703621,470489295,en,2,0,0,0,"[{'type': 'replied_to', 'id': '1011681883086905344'}]",everyone,Twitter Web App,@GeorgeAylett The FBPE cults reaction to Corbyn visiting a refugee camp instead of attending their sad little march proves any claim by them of being internationalist is a bare faced lie.,2011-02-08T20:21:14.000Z,🍞🌹,249318908,🇵🇸marxist rashford⁷🇵🇸,1152,1147,3,31011,JohnMcMarx,False
+40,716598241,author_id: 716598241,coversation_id: 1011681883086905344,1011681883086905344,2018-06-26T19:14:35.000Z,"[{'start': 0, 'end': 13, 'username': 'GeorgeAylett', 'id': '470489295'}]",1011689198959710209,id: 1011689198959710209,470489295,en,1,0,0,0,"[{'type': 'replied_to', 'id': '1011681883086905344'}]",everyone,Twitter Web Client,"@GeorgeAylett Well said, Mr A.",2012-07-25T19:15:04.000Z,Archaeologist & 🌈 LGBTQ Advocate | https://t.co/kNxiI4U86H Hon Research Fellow at Durham University | https://t.co/KPkr6JthEm | Pro EU,716598241,"Spencer Carter 🌈 #Archaeologist, FSA Scot",3622,3626,66,52404,microburin,False
+41,295603589,author_id: 295603589,coversation_id: 1011681883086905344,1011681883086905344,2018-06-26T18:59:40.000Z,"[{'start': 0, 'end': 13, 'username': 'GeorgeAylett', 'id': '470489295'}]",1011685444625584128,id: 1011685444625584128,470489295,en,0,0,0,0,"[{'type': 'replied_to', 'id': '1011681883086905344'}]",everyone,Twitter for iPhone,"@GeorgeAylett Just like Boris went to Afghanistan to discuss trade deal....
+And JC even more silent about #Brexit than Boris about Heathrow.",2011-05-09T10:31:57.000Z,"Left wing, pro European, intersect. sex+ feminist, atheist, EU migrant, net contributor, poly sapiosexual, kink. Pronouns: he-him/they. Moved to NL",295603589,Steph. #RefugeesWelcome. #NHSPay15 #GTTO,1159,1775,13,68180,SoftDvil,False
+42,2994730247,author_id: 2994730247,coversation_id: 1011681883086905344,1011681883086905344,2018-06-26T18:57:00.000Z,"[{'start': 0, 'end': 13, 'username': 'GeorgeAylett', 'id': '470489295'}]",1011684772433801216,id: 1011684772433801216,470489295,en,0,0,0,0,"[{'type': 'replied_to', 'id': '1011681883086905344'}]",everyone,Twitter Web App,@GeorgeAylett This is a distortion of reality.,2015-01-23T20:18:25.000Z,"I like all the Science's & social science + horticulture+food production opera,rock,blues, country,goth. I like to Read a cross range of subjects, plus Dr Who",2994730247,Terry moore,228,100,4,60817,linnetdoonan,False
+43,1194082446,author_id: 1194082446,coversation_id: 1011681883086905344,1011681883086905344,2018-06-26T18:55:47.000Z,"[{'start': 0, 'end': 13, 'username': 'GeorgeAylett', 'id': '470489295'}, {'start': 14, 'end': 26, 'username': 'helenmallam', 'id': '1930615940'}]",1011684466912366592,id: 1011684466912366592,470489295,en,1,0,0,0,"[{'type': 'replied_to', 'id': '1011681883086905344'}]",everyone,Twitter for Android,@GeorgeAylett @helenmallam Does anyone realise that he wouldn't have gone to the rally if he'd been at home? He would have been sorting out his courgettes or something.,2013-02-18T17:31:54.000Z,Simon Jenkins (not the journo) who tries sarcasm to avoid anger. I'm exactly what is wrong with social media. Socialist party member #FreetheNorth #SWFC ⚽,1194082446,Simon the Cynical,2370,2586,4,43494,HillsideD,False
+44,889056755426222083,author_id: 889056755426222083,coversation_id: 1011681883086905344,1011681883086905344,2018-06-26T18:53:17.000Z,"[{'start': 0, 'end': 13, 'username': 'GeorgeAylett', 'id': '470489295'}]",1011683837900935174,id: 1011683837900935174,470489295,en,2,0,1,0,"[{'type': 'replied_to', 'id': '1011681883086905344'}]",everyone,Twitter Web Client,@GeorgeAylett Where was Hilary Benn should have been the cry. He was the led speaker for the decision to bomb Syria. A stupid decision that simply destroyed much of the infrastructure in Syria and led to a steady stream of displaced Syrians.,2017-07-23T09:37:03.000Z,Left Wing News alternative to the biased press. Site updated hourly. Let's make the world fair #Corbyn #JC4PM #NHS,889056755426222083,Left Insider,5682,4034,7,2147,LeftInsider,False
+45,16581085,author_id: 16581085,coversation_id: 1011681883086905344,1011681883086905344,2018-06-26T18:49:08.000Z,"[{'start': 0, 'end': 13, 'username': 'GeorgeAylett', 'id': '470489295'}]",1011682792315543557,id: 1011682792315543557,470489295,en,8,0,0,0,"[{'type': 'replied_to', 'id': '1011681883086905344'}]",everyone,Twitter for iPhone,"@GeorgeAylett Sick of the whole FBPE AstroTurf lot. 
+Noisy but meaningless.",2008-10-03T17:52:26.000Z,Democratic Socialist and West Ham fan....Dry your eyes.,16581085,Wassboy,366,1627,8,9579,Wassboy,False
