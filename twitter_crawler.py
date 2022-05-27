@@ -1469,7 +1469,7 @@ It will automatically stop the function when it reaches the `limit_amount_of_ret
             if counter_loops > 1:
                 next_token = json_response["meta"]["next_token"]
                 query_params["next_token"] = next_token
-                print("token to insert:",next_token)
+                if verbose: print("token to insert:",next_token)
             #if the returned amount of quotes is getting close to the limit number, we need to alter the max_result,
             #so we won't get quotes beyond what we asked
             if (limit_amount_of_returned_comments - num_of_returned_comments) < max_results:
