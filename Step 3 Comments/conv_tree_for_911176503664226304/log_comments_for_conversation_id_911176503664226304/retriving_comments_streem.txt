@@ -1,0 +1,11 @@
+Current Time: 18:23:15 (Date: 27.05.22)   *****************************************   
+
+1 -> Got from twitter 100 comments, and there are more comments of that conversation-id to get, I am bringing more comments!
+Total amount of tweets: 100
+
+2 -> Got from twitter 96 comments, and there are more comments of that conversation-id to get, I am bringing more comments!
+Total amount of tweets: 196
+
+3 -> Got from twitter 53 comments, and there are more comments of that conversation-id to get, I am bringing more comments!
+Total amount of tweets: 249
+

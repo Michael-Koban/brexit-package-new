@@ -39,3 +39,30 @@ Total amount of tweets: 1155
 13 -> Got from twitter 100 comments, and there are more comments of that conversation-id to get, I am bringing more comments!
 Total amount of tweets: 1255
 
+14 -> Got from twitter 98 comments, and there are more comments of that conversation-id to get, I am bringing more comments!
+Total amount of tweets: 1353
+
+15 -> Got from twitter 99 comments, and there are more comments of that conversation-id to get, I am bringing more comments!
+Total amount of tweets: 1452
+
+16 -> Got from twitter 98 comments, and there are more comments of that conversation-id to get, I am bringing more comments!
+Total amount of tweets: 1550
+
+17 -> Got from twitter 100 comments, and there are more comments of that conversation-id to get, I am bringing more comments!
+Total amount of tweets: 1650
+
+18 -> Got from twitter 98 comments, and there are more comments of that conversation-id to get, I am bringing more comments!
+Total amount of tweets: 1748
+
+19 -> Got from twitter 96 comments, and there are more comments of that conversation-id to get, I am bringing more comments!
+Total amount of tweets: 1844
+
+20 -> Got from twitter 99 comments, and there are more comments of that conversation-id to get, I am bringing more comments!
+Total amount of tweets: 1943
+
+21 -> Got from twitter 98 comments, and there are more comments of that conversation-id to get, I am bringing more comments!
+Total amount of tweets: 2041
+
+22 -> Got from twitter 4 comments, and there are more comments of that conversation-id to get, I am bringing more comments!
+Total amount of tweets: 2045
+

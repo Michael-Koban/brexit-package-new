@@ -1,0 +1,5 @@
+,author_id,author_id_new,conv_id_new,conversation_id,created_at,entities.mentions,id,id_new,in_reply_to_user_id,lang,public_metrics.like_count,public_metrics.quote_count,public_metrics.reply_count,public_metrics.retweet_count,referenced_tweets,reply_settings,source,text,users.created_at,users.description,users.id,users.name,users.public_metrics.followers_count,users.public_metrics.following_count,users.public_metrics.listed_count,users.public_metrics.tweet_count,users.username,users.verified
+0,385811349,author_id: 385811349,coversation_id: 924888597672677377,924888597672677377,2017-10-30T08:03:00.000Z,"[{'start': 0, 'end': 12, 'username': 'DominicRaab', 'id': '4764882552'}]",924909488083296256,id: 924909488083296256,4764882552,en,0,0,0,0,"[{'type': 'replied_to', 'id': '924888597672677377'}]",everyone,Twitter for Android,"@DominicRaab What... is this #DespiteBrexit ?
+The #Remoaners are going to hate this...",2011-10-06T05:16:09.000Z,"Account is locked at times because of stalking by leftwhinge #Trolls who should know better.
+
+My views are my own and Retweets are not necessarily endorsements.",385811349,Digger,1348,1613,35,135551,Linley75,False

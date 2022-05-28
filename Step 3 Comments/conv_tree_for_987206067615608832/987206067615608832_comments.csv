@@ -1,0 +1,6 @@
+,author_id,author_id_new,conv_id_new,conversation_id,created_at,entities.mentions,id,id_new,in_reply_to_user_id,lang,public_metrics.like_count,public_metrics.quote_count,public_metrics.reply_count,public_metrics.retweet_count,referenced_tweets,reply_settings,source,text,users.created_at,users.description,users.id,users.name,users.public_metrics.followers_count,users.public_metrics.following_count,users.public_metrics.listed_count,users.public_metrics.tweet_count,users.username,users.verified
+0,141730404,author_id: 141730404,coversation_id: 987206067615608832,987206067615608832,2018-04-20T06:04:40.000Z,"[{'start': 0, 'end': 12, 'username': 'DominicRaab', 'id': '4764882552'}]",987210421458305025,id: 987210421458305025,4764882552,en,1,0,0,1,"[{'type': 'replied_to', 'id': '987206067615608832'}]",everyone,Twitter for Android,"@DominicRaab Interesting. Monique Melis suggests taxation of financial services is a risk to the City's position, and argues that it shouldn't be taxed more because financial services doesn't pollute and put plastic in the oceans.
+
+No it just contributes to the odd global crisis now and then.",2010-05-08T21:54:53.000Z,"Policy and research @the3million.
+Fan of the @SWCoastPath, PR @MakeVotesMatter.
+Dutchie in UK for many years, NederBrit since 2017.",141730404,Monique Hawkins,2834,680,19,14021,monlouhawk,False

@@ -1,0 +1,9 @@
+,author_id,author_id_new,conv_id_new,conversation_id,created_at,entities.mentions,id,id_new,in_reply_to_user_id,lang,public_metrics.like_count,public_metrics.quote_count,public_metrics.reply_count,public_metrics.retweet_count,referenced_tweets,reply_settings,source,text,users.created_at,users.description,users.id,users.name,users.public_metrics.followers_count,users.public_metrics.following_count,users.public_metrics.listed_count,users.public_metrics.tweet_count,users.username,users.verified
+0,285845848,author_id: 285845848,coversation_id: 479621713786068992,479621713786068992,2014-06-19T13:56:01.000Z,"[{'start': 1, 'end': 14, 'username': 'MartinSchulz', 'id': '17675072'}]",479623638682198017,id: 479623638682198017,17675072,en,2,0,0,6,"[{'type': 'replied_to', 'id': '479621713786068992'}]",everyone,Twitter Web Client,.@MartinSchulz RT FelipeVI could start repealing retroactive cuts to #renewable energy and RECOVERING LEGAL SECURITY http://t.co/mhGCXWLW2o,2011-04-21T22:08:41.000Z,"Multi-ESTAFADO x #PPsoe con Garantía del ESTADO❓
+#INSEGURIDADJURIDICA
+#AuditoriaElectricaYa
+#SoldOut
+#CaminoDelSol
+#NosRobanelSol
+#OligopolyOFF 
+#FOTOVOLTAICA",285845848,Anticiclón,6095,6703,105,36663,ALTAS_PRESIONES,False
