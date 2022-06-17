@@ -314,8 +314,8 @@ max_results = The max number of tweets to retrieve in a given call. Must be an i
             if counter_loops > 1:
                 next_token = json_response["meta"]["next_token"]
                 query_params["next_token"] = next_token
-                if verbose_10:
-                    print("token to insert:",next_token)
+                #if verbose_10:
+                #    print("token to insert:",next_token)
             #if the returned amount of tweets is getting close to the limit number, we need to alter the max_result,
             #so we won't get tweets beyond what we asked
             if (limit_amount_of_returned_tweets - num_of_returned_tweets) < max_results:
@@ -2038,8 +2038,8 @@ Note that the format of the end time should be: "2021-12-26T00:00:00Z" (this is 
             if counter_loops > 1:
                 next_token = json_response["meta"]["next_token"]
                 query_params["next_token"] = next_token
-                if verbose_10:
-                    print("token to insert:",next_token)
+                #if verbose_10:
+                #    print("token to insert:",next_token)
             #if the returned amount of tweets is getting close to the limit number, we need to alter the max_result,
             #so we won't get tweets beyond what we asked
             if (limit_amount_of_returned_tweets - num_of_returned_tweets) < max_results:
