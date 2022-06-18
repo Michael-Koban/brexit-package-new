@@ -2149,7 +2149,188 @@ Note that the format of the end time should be: "2021-12-26T00:00:00Z" (this is 
 
         return json_response_list, num_of_returned_tweets, next_tokens
 
+##########################################################################################################
+#### return tweets given tweet ids
 
+
+    def return_tweets_given_tweet_ids_new(self, tweet_ids=[], number_of_tweets_in_batch = 100,
+                                           verbose_10 = False, dir_name = "tweets_by_tweet_ids",
+                                  csv_table_name = "brexit_tweet_ids", api_error_sleep_secs = 60):
+        """ ## Return Tweets of of given tweet ids
+
+This function enalbes getting all the tweets that are in a list of given tweet ids.\n
+
++ link to twitter-developer page regarding this capability:
+https://developer.twitter.com/en/docs/twitter-api/tweets/search/api-reference/get-tweets-search-all
+
+### App rate limit:
+        - App rate limit (Application-only): 900 requests per 15-minute window shared among all users of your app
+        - User rate limit (User context): 900 requests per 15-minute window per each authenticated user
+        
+Parameters
+- tweet_ids - a list with tweet ids (must be a list of strings)
+
+- dir_name: by defualy "tweets_by_tweet_ids" --> the dir name to put all the data from the function
+
+- number_of_tweets_in_batch = The max number of tweets to retrieve in a given call. Must be an integer between 1 to 100.
+
+- verbose_10 - by default = False --> If True then the function will print certain things throught the run of the function.    
+
+- csv_table_name - the csv name that you wish to give to the table that the function generates. Note that this name will also be the name of the log dir that will contain the tokens and the tweets-json file. This is important as if you wish to continue searching for more tweets of the same query, you need to provide the same csv table name
+        """
+        search_url = "https://api.twitter.com/2/tweets/?ids=X" #endpoint use to collect data from
+        
+        #creating a directory that will contain the csv file + the log directory of the Key Opinion Leader
+        import os.path
+        try:
+            os.mkdir(dir_name)
+            print("creating directory", dir_name, "to insert the tables with the tweets for the given tweet-ids")
+        except:
+            print("The dir", dir_name ,"already exist")
+        
+    ##### Creating the log directory (that will contain 3 files: The token file, the retriving tweets streem and the full json file)
+        dir_log_name = os.path.join(dir_name, "log_tweets")
+
+        # Try creating the directory for the logs, if the path exist don't create a new one. Print in either case What happened
+        try:
+            os.mkdir(dir_log_name)
+            print("creating directory", dir_log_name, "to insert all the logs of the tweets")
+        except:
+            print("The dir", dir_log_name ,"already exist")
+        ######################## creating a path for the specific user that we wish to retirve his tweets
+        path_for_log_dir_of_certain_query = os.path.join(dir_log_name, csv_table_name)
+        # Try creating the directory for the specific user, if the path exist don't create a new one. Print in either case What happened
+        try:
+            os.mkdir(path_for_log_dir_of_certain_query)
+            print("creating directory", path_for_log_dir_of_certain_query,"in the dir",dir_log_name, "to insert all the logs of the QUERY", csv_table_name)
+        except:
+            print("The dir", path_for_log_dir_of_certain_query ,"already exist")
+        ### creating the log-text-file of the "retriving_tweets_streem" This log file will contain a time-stamp
+        # of the time you activated the function, and in each call to twitter API it will write in that log-file
+        # the number of tweets that the function retirved in that call + the totla number of tweets retrived so far.
+        # With this text file you can follow up in any time the function runs what is the status of the call - 
+        # you can see how many tweets have been collected on a specifc user and know that the function works fine.
+        path_for_dir_retriving_tweets_streem = os.path.join(path_for_log_dir_of_certain_query, 'retriving_tweets_streem.txt')
+        with open(path_for_dir_retriving_tweets_streem, 'a') as f:
+            from datetime import datetime
+            now = datetime.now()
+            current_time = now.strftime("%H:%M:%S (Date: %d.%m.%y)")
+            current_time = "Current Time: " + current_time + "   *****************************************   "
+            f.write(current_time + '\n\n')
+        
+        ############################################################################
+        ### splitting the tweet_ids into batches
+        n = number_of_tweets_in_batch
+        if n > 100:
+            n = 100
+            print('Each batch can contain a max of 100 tweet-ids, changed to 100')
+        if n < 1:
+            n = 1
+            print('Each batch must contain a minimum of 1 tweet-id, changed to 1')
+        
+        batches=[tweet_ids[i:i + n] for i in range(0, len(tweet_ids), n)]
+        num_of_returned_tweets = 0 # counter of returned tweets
+        problematic_batches = [] #save all the batches that weren't evaluated
+        
+        from tqdm.notebook import tqdm_notebook
+        json_response_list = []
+        json_response_list_all_batches = []
+        counter_loops = 0
+        for batch in tqdm_notebook(batches):
+            search_url = "https://api.twitter.com/2/tweets/?ids=X"
+            #print(batch)
+            counter_loops +=1
+            search_url, query_params = self.create_url_tweet_ids(search_url , batch)
+            #print(search_url)
+            try:
+                json_response = self.__connect_to_endpoint(url = search_url, params= query_params)
+            except Exception as e:
+                print(f'Twitter API error: {e} \n Sleeping 15 min from {datetime.datetime.now()}')
+                time.sleep(api_error_sleep_secs)
+                problematic_batches.append(batch)
+
+            json_response_list.append(json_response) #the first json_response itme
+            
+            ##### making a dataframe out of the json response:
+            try:
+                a = pd.json_normalize(json_response["data"])
+                b = pd.json_normalize(json_response["includes"], ["users"]).add_prefix("users.")
+
+                a.conversation_id = a.conversation_id.astype("string")
+                a.id = a.id.astype("string")
+                a["id_new"] = "id: " + a["id"].astype("string")
+                a["conv_id_new"] = "conv_id: " + a["conversation_id"].astype("string")
+                a["author_id_new"] = "author_id: " + a["author_id"].astype("string")
+
+            #c = pd.json_normalize(json_response["includes"]["places"]).add_prefix("places.")
+                df_tweets_i = pd.merge(a, b, left_on="author_id", right_on="users.id")
+                list_of_cols_to_add = ['author_id', "author_id_new", 'conversation_id', "conv_id_new",
+                                        "id", "id_new",'created_at','entities.mentions',
+                            'public_metrics.like_count', 'public_metrics.quote_count',
+                        'public_metrics.reply_count', 'public_metrics.retweet_count','referenced_tweets', 'text',
+                            'users.created_at', 'users.description','users.id', 'users.name',
+                        'users.public_metrics.followers_count', 'users.public_metrics.following_count',
+                        'users.public_metrics.listed_count', 'users.public_metrics.tweet_count',
+                        'users.username', 'users.verified']
+
+                list_cols_to_drop = [x for x in df_tweets_i.columns if x not in list_of_cols_to_add]
+
+                ##droping labels (columns) we don't need
+                df_tweets_i = df_tweets_i.drop(labels=list_cols_to_drop, axis = 1, errors = "ignore")
+
+                for col in list_of_cols_to_add:
+                    if col not in df_tweets_i.columns:
+                        df_tweets_i[col] = "NA"
+
+                #sort columns by alphabetic order
+                col_list_df_tweets_i = df_tweets_i.columns.tolist()
+                col_list_df_tweets_i.sort()
+                df_tweets_i = df_tweets_i.reindex(columns=col_list_df_tweets_i)
+                
+                num_of_returned_tweets += df_tweets_i.shape[0]
+                #This will be the csv file name that will contain all the tweets of the specific user:
+                name =  csv_table_name + ".csv"
+                path_for_table = os.path.join(dir_name, name)
+                if os.path.isfile(path_for_table) == False: #if this is the first table of tweets
+                    df_tweets_i.to_csv(path_for_table, index=True)
+                else:
+                    df_tweets_i.to_csv(path_for_table, mode='a', index=True, header=False)
+                    
+                number_of_read_tweets_for_printing = df_tweets_i.shape[0]
+                
+                #display(df_tweets_i)
+                
+                ### document the tweet ids that were succsefuly evaluted:
+                path_for_evaluated_tweet_ids = os.path.join(path_for_log_dir_of_certain_query, 'evaluated_tweet_ids.txt')
+                with open(path_for_evaluated_tweet_ids, 'a') as f:
+                    for tweet_id in batch:
+                        f.write(tweet_id+'\n')
+
+            except:
+                print("no data / include in the json")
+                number_of_read_tweets_for_printing = 0
+                path_for_not_evaluated_tweet_ids = os.path.join(path_for_log_dir_of_certain_query, 'Problematic_tweet_ids.txt')
+                with open(path_for_not_evaluated_tweet_ids, 'a') as f:
+                    for tweet_id in batch:
+                        f.write(tweet_id+'\n')
+            ### save all the json responses in json file:
+            path_for_dir_all_json_responses = os.path.join(path_for_log_dir_of_certain_query, 'all_json_responses.json')
+             
+            if os.path.isfile(path_for_dir_all_json_responses) == False: #if this is the first json of tweets
+                with open(path_for_dir_all_json_responses, 'w') as outfile:
+                    json.dump(json_response_list, outfile)
+            else:
+                with open(path_for_dir_all_json_responses, 'a') as outfile:
+                    json.dump(json_response_list, outfile)
+
+            ### Writing in the retrieving tweets log file the number of retrieved tweets + status - is the function finished running or keep retrieving more tweets?
+            with open(path_for_dir_retriving_tweets_streem, 'a') as f:
+                print_stat = str(counter_loops) + " -> Got from twitter " + str(number_of_read_tweets_for_printing) + " tweets, and there are more tweets of that user to get, I am bringing more tweets!"
+                f.write(print_stat+'\n')
+                print_total = "Total amount of tweets: " + str(num_of_returned_tweets)
+                f.write(print_total+ '\n\n')
+
+        return json_response_list, num_of_returned_tweets, problematic_batches
 
 ############################################# Conversation Tree #############################################
 
